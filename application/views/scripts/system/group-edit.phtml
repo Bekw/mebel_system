@@ -1,0 +1,58 @@
+<div class="modal-body" id="modal_body">
+    <form id="form_id">
+        <input type="hidden" value="<?=$this->group_id?>" name="group_id">
+        <div class="form-group">
+            <label class="control-label " for="group_name">Название</label>
+            <input type="text" id="group_name" placeholder="Название роли" class="form-control" value="<?=$this->row['group_name']?>" name="group_name">
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label " for="group_code">Код</label>
+            <input type="text" id="group_code" placeholder="Код роли" class="form-control" value="<?=$this->row['group_code']?>" name="group_code">
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+    </form>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" name="upd_group" onclick="updGroup()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+
+<script>
+    $(document).ready(function() {
+    });
+
+    function updGroup(){
+        var send_data = $('#form_id').serializeArray();
+        var dataObj = {};
+        $(send_data).each(function(i, field){
+            dataObj[field.name] = field.value;
+        });
+        $.ajax({
+            type: 'POST',
+            data: send_data,
+            url: "/system/index-json/mode/upd-group/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    if(dataObj['group_id'] > 0){
+                        Notify.generate('Роль отредактирована', '', 1);
+                    }else{
+                        Notify.generate('Роль добавлена', '', 1);
+                    }
+                    location.reload();
+                }
+            }
+        });
+    }
+</script>

@@ -1,0 +1,62 @@
+<div class="modal-body">
+    <?
+    if (isset($this->row['error'])) {?>
+        <div class="alert alert-danger">
+            <?=$this->row['error']?>
+        </div>
+        <?
+    }?>
+    <div class="clearfix"></div>
+    <div class="">
+        <form id="form_type">
+            <input type="hidden" value="<?=$this->material_type_id?>" name="material_type_id">
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label class="control-label " for="material_type_name">Название</label>
+                    <input type="text" id="material_type_name" placeholder="Название" class="form-control" value="<?=$this->row['material_type_name']?>" name="material_type_name">
+                    <div class="clearfix"></div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label class="control-label " for="material_type_code">Код</label>
+                    <input type="text" id="material_type_code" placeholder="Код" class="form-control" value="<?=$this->row['material_type_code']?>" name="material_type_code">
+                    <div class="clearfix"></div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="clearfix"></div>
+        </form>
+    </div>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" id="btn_photo" onclick="saveMaterialType()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+<script>
+    function saveMaterialType(){
+        var send_data = $('#form_type').serializeArray();
+        $.ajax({
+            type: 'POST',
+            url: "/dict/material-type-list/mode/upd/",
+            data:  send_data,
+            success: function(data){
+                if(data.result['status']){
+                    $('.modal').modal('hide');
+                    location.reload();
+                }else{
+                    alert(data.result['error'])
+                }
+            }
+        });
+    }
+</script>
+

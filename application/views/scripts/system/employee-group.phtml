@@ -1,0 +1,172 @@
+<div class="page-header">
+    <h1>Привилегии пользователей</h1>
+</div>
+<input type="hidden" id="employee_id" name="employee_id">
+<input type="hidden" id="reload_type" name="reload_type">
+<div class="col-lg-4">
+    <div class="widget-box">
+        <div class="widget-header">
+            <h4 class="widget-title">Пользователи</h4>
+            <div class="widget-toolbar">
+                <a data-action="collapse" href="#">
+                    <i class="ace-icon fa fa-chevron-up"></i>
+                </a>
+            </div>
+        </div>
+        <div class="widget-body" style="display: block;">
+            <div class="widget-main">
+                <div class="table-responsive">
+                    <table class="table table-bordered hover-table" id="widget_table">
+                        <thead>
+                        <tr>
+                            <th>ФИО</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?
+                        if(count($this->row_employee) > 0){
+                            foreach ($this->row_employee as $key => $value){?>
+                                <tr>
+                                    <td onclick="getEmployeeId(<?=$value['employee_id']?>, this);"><?=$value['fio']?></td>
+                                </tr>
+                                <?
+                            }
+                        }?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-lg-4">
+    <div class="widget-box loading-widget" id="group_widget">
+        <div class="widget-header">
+            <h4 class="widget-title">Роли</h4>
+            <div class="widget-toolbar">
+                <a data-action="collapse" href="#">
+                    <i class="ace-icon fa fa-chevron-up"></i>
+                </a>
+            </div>
+        </div>
+        <div class="widget-body" style="display: block;">
+            <div class="widget-main">
+                <div class="table-responsive">
+                    <table class="table table-bordered hover-table" id="group_table">
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?
+                        if(count($this->row_group) > 0){
+                            foreach ($this->row_group as $key => $value){?>
+                                <tr>
+                                    <td>
+                                        <div class="checkbox no-margin">
+                                            <label>
+                                                <input type="checkbox" class="ace" id="group_<?=$value['group_id']?>" value="<?=$value['group_id']?>"  onchange="employeeGroupLink(<?=$value['group_id']?>, this)">
+                                                <span class="lbl margin-right-5"><?=$value['group_name']?></span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?
+                            }
+                        }?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+    });
+
+    function getEmployeeId(employee_id, ob) {
+        $('#employee_id').attr('value', employee_id);
+        $('#reload_type').attr('value', 'all');
+        $('#widget_table tbody tr').removeClass('selected-td');
+        $(ob).closest('tr').addClass('selected-td');
+
+        groupReadByEmployee(employee_id);
+    }
+
+    function employeeGroupLink(group_id, ob) {
+        var employee_id = $('#employee_id').val();
+        $('#reload_type').attr('value', 'group');
+        if(employee_id == ''){
+            alert('Необходимо выбрать Пользователя!');
+            $(ob).prop('checked', false);
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/employee-group-link/group_id/" + group_id + "/employee_id/" + employee_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    groupReadByEmployee(employee_id);
+                }
+            }
+        });
+    }
+
+    function groupReadByEmployee(employee_id) {
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/group-read-by-employee/employee_id/" + employee_id,
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    //обновить checkbox в меню
+                    $.each(data.result.value, function(i,item){
+                        if(item.is_checked > 0){
+                            $("#group_" + item.group_id).prop("checked",true);
+                            $("#group_" + item.group_id).closest('tr').addClass('selected-td');
+                        }
+                        else{
+                            $("#group_" + item.group_id).prop("checked",false);
+                            $("#group_" + item.group_id).closest('tr').removeClass('selected-td');
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function startReload() {
+        if($('#reload_type').val() == 'all'){
+            $('.loading-widget').widget_box('reload');
+            $('#reload_type').attr('value', '');
+        }else if($('#reload_type').val() == 'group'){
+            $('#group_widget').widget_box('reload');
+            $('#reload_type').attr('value', '');
+        }else if($('#reload_type').val() == 'city'){
+            $('#city_widget').widget_box('reload');
+            $('#reload_type').attr('value', '');
+        }
+    }
+
+    function stopReload() {
+        $('.loading-widget').find('.widget-box-overlay').remove();
+        $('.loading-widget').removeClass('position-relative');
+    }
+
+    $(document).ajaxStart(function() {
+        startReload();
+    });
+
+    $(document).ajaxStop(function() {
+        stopReload();
+    });
+</script>

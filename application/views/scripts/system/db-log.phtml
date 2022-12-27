@@ -1,0 +1,27 @@
+<div class="page-header">
+    <?
+    $is_active = "Не активный";
+    $session = new Zend_Session_Namespace('Global');
+    if (isset($session->is_db_func_log)){
+        if ($session->is_db_func_log){
+            $is_active = "Активный";
+        }
+    }
+    ?>
+    <h1 class="pull-left">Логирование вызовов функций <?=$is_active?></h1>
+    <div class="clearfix"></div>
+</div>
+<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+    <form method="post" id="form_id" autocomplete="off">
+        <button type="submit" name="btn_active" style="margin-right: 5px;" class="btn btn-success pull-left">Активировать логирование</button>
+        <button type="submit" name="btn_clear" style="margin-right: 5px;" class="btn btn-success pull-left">Очистить</button>
+        <button type="submit" class="btn btn-success pull-left">Обновить</button>
+        <div class="clearfix"></div>
+    </form>
+</div>
+<div class="clearfix"></div>
+
+<div style="padding-top:10px;">
+    <?=$this->content;?>
+</div>
+

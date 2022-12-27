@@ -1,0 +1,109 @@
+<div class="modal-body" id="modal_body">
+    <form id="form_id">
+        <input type="hidden" value="<?=$this->grant_id?>" name="grant_id">
+        <div class="form-group">
+            <label class="control-label " for="grant_name">Название</label>
+            <input type="text" id="grant_name" placeholder="Название права" class="form-control" value="<?=$this->row['grant_name']?>" name="grant_name">
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label " for="grant_code">Код</label>
+            <input type="text" id="grant_code" placeholder="Код права" class="form-control" value="<?=$this->row['grant_code']?>" name="grant_code">
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label " for="menu_pid">Родитель</label>
+            <div class="form-control no-padding">
+                <select class="chosen-select form-control" name="grant_pid" id="grant_pid" data-placeholder="Выберите родителя...">
+                    <option value="0"> </option>
+                    <?
+                    if(count($this->row_grant_for_select) > 0){
+                        foreach ($this->row_grant_for_select as $key => $value){
+                            $padding = '';
+                            if(($value['level'] - 1)*30 > 0){
+                                $padding = 'padding-left:' . ($value['level'] - 1)*30 . 'px;';
+                            }else{
+                                $padding = 'padding-left: 10px; font-weight: bold;';
+                            }
+                            ?>
+                            <option style="<?=$padding?>" <?if($this->row['grant_pid'] == $value['grant_id']){echo ' selected';}?> value="<?=$value['grant_id']?>"><?=$value['grant_name']?></option>
+                            <?
+                        }
+                    }?>
+                </select>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label " for="order_num">Порядковый номер</label>
+            <input type="number" id="order_num" placeholder="Порядковый номер" class="form-control" value="<?=$this->row['order_num']?>" name="order_num">
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label " for="is_active">Активный</label>
+            <div class="form-control no-padding">
+                <?
+                $active = "";
+                $not_active = "";
+                if($this->row['is_active'] > 0){
+                    $active = ' selected';
+                }else{
+                    $not_active = ' selected';
+                }
+                ?>
+                <select class="form-control" id="is_active" name="is_active" required>
+                    <option value="0" <?=$not_active?>>Нет</option>
+                    <option value="1" <?=$active?>>Да</option>
+                </select>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+    </form>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" name="upd_grant" onclick="updGrant()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $(".chosen-select").chosen({
+            allow_single_deselect: true,
+            no_results_text: "Ничего не найдено..."
+        });
+    });
+
+    function updGrant(){
+        var send_data = $('#form_id').serializeArray();
+        var dataObj = {};
+        $(send_data).each(function(i, field){
+            dataObj[field.name] = field.value;
+        });
+        $.ajax({
+            type: 'POST',
+            data: send_data,
+            url: "/system/index-json/mode/upd-grant/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    if(dataObj['group_id'] > 0){
+                        Notify.generate('Право отредактировано', '', 1);
+                    }else{
+                        Notify.generate('Право добавлено', '', 1);
+                    }
+                    location.reload();
+                }
+            }
+        });
+    }
+</script>

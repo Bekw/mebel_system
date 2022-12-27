@@ -1,0 +1,110 @@
+<div class="modal-body" id="modal_body">
+    <form id="form_id">
+        <div class="col-lg-6">
+            <input type="hidden" value="<?=$this->employee_id?>" name="employee_id">
+            <div class="form-group">
+                <label class="control-label " for="fio">ФИО</label>
+                <input type="text" id="fio" placeholder="ФИО" class="form-control" value="<?=$this->row['fio']?>" name="fio">
+                <div class="clearfix"></div>
+            </div>
+            <div class="form-group">
+                <label class="control-label " for="email">Email</label>
+                <input type="text" id="email" placeholder="Email" class="form-control" value="<?=$this->row['email']?>" name="email">
+                <div class="clearfix"></div>
+            </div>
+            <div class="form-group">
+                <label class="control-label " for="email">Телефон</label>
+                <input type="text" id="phone" placeholder="Телефон" class="form-control" value="<?=$this->row['phone']?>" name="phone">
+                <div class="clearfix"></div>
+            </div>
+            <div class="form-group">
+                <label class="control-label " for="is_active">Активный</label>
+                <div class="form-control no-padding">
+                    <?
+                    $active = "";
+                    $not_active = "";
+                    if($this->row['is_active'] > 0){
+                        $active = ' selected';
+                    }else{
+                        $not_active = ' selected';
+                    }
+                    ?>
+                    <select class="form-control" id="is_active" name="is_active" required>
+                        <option value="0" <?=$not_active?>>Нет</option>
+                        <option value="1" <?=$active?>>Да</option>
+                    </select>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group">
+                <label class="control-label " for="position_id">Должность</label>
+                <div class="form-control no-padding">
+                    <select class="form-control" id="position_id" name="position_id">
+                        <option value="0">Выберите должность</option>
+                        <?
+                        if(count($this->row_position) > 0){
+                            foreach($this->row_position as $key => $value){?>
+                                <option value="<?=$value['position_id']?>" <?if($this->row['position_id'] == $value['position_id']){echo ' selected';}?>><?=$value['position_name']?></option>
+                                <?
+                            }
+                        }?>
+                    </select>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="clearfix"></div>
+
+    </form>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" name="upd_employee" onclick="updEmployee()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $(document).ready(function() {
+            $(".chosen-select").chosen({
+                allow_single_deselect: true,
+                no_results_text: "Ничего не найдено..."
+            });
+        });
+    });
+
+    function updEmployee(){
+        var send_data = $('#form_id').serializeArray();
+        var dataObj = {};
+        $(send_data).each(function(i, field){
+            dataObj[field.name] = field.value;
+        });
+        $.ajax({
+            type: 'POST',
+            data: send_data,
+            url: "/system/index-json/mode/upd-employee/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    if(dataObj['employee_id'] > 0){
+                        Notify.generate('Пользователь отредактирован', '', 1);
+                    }else{
+                        Notify.generate('Пользователь добавлен', '', 1);
+                    }
+                    location.reload();
+                }
+            }
+        });
+    }
+</script>

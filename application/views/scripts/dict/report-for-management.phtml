@@ -1,0 +1,151 @@
+<style>
+    .popover{
+        max-width: 100%;
+    }
+    .select2-container {
+        min-width:250px;
+    }
+    .select2-container--classic .select2-search--inline .select2-search__field{
+        width: auto !important;
+    }
+</style>
+<div class="page-header">
+    <h1 class="pull-left">Отчеты для руководителей</h1>
+    <div class="clearfix"></div>
+</div>
+<div class="clearfix"></div>
+<div class="table-responsive">
+    <table class="table-local table-striped table-bordered hover-table no-margin-bottom no-border-top">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th colspan="1">Зеленый</th>
+            <th colspan="2">Желтый</th>
+            <th colspan="1">Красный</th>
+            <th>Описание</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?
+        if(mycount($this->row) > 0){
+            foreach ($this->row as $key => $value){
+                if($value['green'] != -1 ){
+                ?>
+                <tr>
+                    <td class="text-right"><?=$value['indicator_id']?></td>
+                    <td class="text-left td-fixed-width-350"><?=$value['indicator_name']?></td>
+                    <td class="text-center" colspan="1" onclick="indicator_list_tab('GREEN', <?=$value['indicator_id']?>)"><button class="btn btn-success btn-sm popover-info" style="width: 100%; padding-top: 0; padding-bottom: 0;"><?=$value['green']?></button></td>
+                    <td class="text-center" colspan="2" onclick="indicator_list_tab('YELLOW', <?=$value['indicator_id']?>)"><button class="btn btn-warning btn-sm popover-info" style="width: 100%; padding-top: 0; padding-bottom: 0;"><?=$value['yellow']?></button></td>
+                    <td class="text-center" colspan="1" onclick="indicator_list_tab('RED', <?=$value['indicator_id']?>)"><button class="btn btn-danger btn-sm popover-info" style="width: 100%; padding-top: 0; padding-bottom: 0;"><?=$value['red']?></button></td>
+                    <td class="text-center">
+                        <span class="blue bigger-140" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="<?=$value['descriprion']?>">
+                            <i class="fa fa-question-circle" aria-hidden="true"></i>
+                        </span>
+                    </td>
+                </tr>
+                <tr id="indicator<?=$value['indicator_id']?>" style="display: none;" class="no-border">
+                    <td colspan="10" class="no-padding">
+                        <div id="indicator_item<?=$value['indicator_id']?>" class="my_request_items" style="padding: 4px 6px;">
+
+                        </div>
+                    </td>
+                </tr>
+                <?
+                }
+            }
+        }
+        ?>
+        </tbody>
+    </table>
+</div>
+<?=$this->partial('dict/modal-container.phtml');?>
+
+<script>
+    var color_save = '';
+    var indicator_save_id = '';
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover();
+
+        /*$(".sr-select2 ").chosen({
+            allow_single_deselect: true,
+            no_results_text: "Ничего не найдено..."
+        });*/
+        $(".sr-select2 ").select2({
+            dropdownAutoWidth : true,
+            width: 'auto',
+            theme: 'classic'
+        });
+        $("#material_search").on("keyup", function() {
+            var numberOfChecked = $('.checkbox_release_item_id:checked').length;
+            var totalCheckboxes = $('.checkbox_release_item_id').length;
+            var value = $(this).val().toLowerCase();
+            $("#table_1 tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+            var numberOfVisible = $("#table_1 tbody tr:visible").length;
+            if(numberOfChecked < numberOfVisible){
+                if(numberOfChecked < totalCheckboxes){
+                    $('#select_all').prop('checked', false);
+                }
+            }
+            if(numberOfChecked == numberOfVisible){
+                if(numberOfChecked < totalCheckboxes){
+                    $('#select_all').prop('checked', true);
+                }
+            }
+            if (numberOfVisible == 0){
+                $('#select_all').prop('checked', false);
+            }
+        });
+    });
+
+    function indicator_list_tab(color, indicator_id, ob){
+        if(color != color_save && indicator_id == indicator_save_id){
+            color_save = color;
+            indicator_save_id = indicator_id;
+            $("#indicator_item" + indicator_id).empty();
+            items_ajax_call(indicator_id, color, ob);
+        }else{
+            color_save = color;
+            indicator_save_id = indicator_id;
+            $('#indicator' + indicator_id).toggle(200, function() {
+                if(!$(this).is(':hidden')) {
+                    $(this).prev('tr').removeClass('open-tr');
+                    $("#indicator_item" + indicator_id).empty();
+                    items_ajax_call(indicator_id, color, ob);
+                }else{
+                    $("#indicator_item" + indicator_id).empty();
+                    $(this).prev('tr').removeClass('open-tr');
+                    color_save = '';
+                    indicator_save_id = 0;
+                }
+            });
+        }
+    }
+
+    function items_ajax_call(indicator_id, ob) {
+        var fd = $("#form_indicator").serializeArray();
+        fd.push({name: "indicator_id", value: indicator_id});
+        fd.push({name: "color", value: color_save});
+        if (color_save == 'GREEN'){
+            color_rus = '<span style="background-color: green;color:white;padding:5px;">Зеленая зона</span>';
+        }
+        if (color_save == 'YELLOW'){
+            color_rus = '<span style="background-color: yellow;color:darkblue;padding:5px;">Желтая зона</span>';
+        }
+        if (color_save == 'RED'){
+            color_rus = '<span style="background-color: red;color:white;padding:5px;">Красная зона</span>';
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/indicator-item-list/",
+            data: $.param(fd),
+            async: true,
+            success: function(data){
+                $(ob).closest('tr').addClass('open-tr');
+                $("#indicator_item" + indicator_id).html('<p>' + color_rus + '</p>' + data);
+            }
+        });
+    }
+</script>

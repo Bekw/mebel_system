@@ -1,0 +1,652 @@
+<script src="/fancytree/jquery.fancytree-all.min.js"></script>
+<link rel="stylesheet" href="/fancytree/skin-win8/ui.fancytree.css">
+<style>
+    .fancytree-container,
+    span.fancytree-focused span.fancytree-title{
+        outline: 0 !important;
+    }
+    .fancytree-selected{
+        background-color: #cbe8f6 !important;
+    }
+    .fancytree-has-children .fancytree-icon{
+        background-position: -80px -16px !important;
+    }
+</style>
+<div class="page-header">
+    <h1>Ведение ролей</h1>
+</div>
+<input type="hidden" name="group_id" id="group_id">
+<input type="hidden" name="reload_type" id="reload_type">
+<div class="col-lg-2">
+    <div class="widget-box">
+        <div class="widget-header">
+            <h4 class="widget-title">Роли</h4>
+            <div class="widget-toolbar">
+                <a data-action="collapse" href="#">
+                    <i class="ace-icon fa fa-chevron-up"></i>
+                </a>
+            </div>
+            <div class="widget-toolbar">
+                <a data-action="add" href="javascript:void(0);" class="green" onclick="showModalGroup(0)">
+                    <i class="ace-icon fa fa-plus-circle fa-lg"></i>
+                </a>
+            </div>
+        </div>
+        <div class="widget-body" style="display: block;">
+            <div class="widget-main">
+                <div class="table-responsive">
+                    <table class="table table-bordered hover-table" id="group_table">
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?
+                        if(count($this->row_group) > 0){
+                            foreach ($this->row_group as $key => $value){?>
+                                <tr>
+                                    <td onclick="getGroupId(<?=$value['group_id']?>, this);"><?=$value['group_name']?></td>
+                                    <td class="del-td">
+                                        <div class="action-buttons">
+                                            <a href="javascript:void(0);" onclick="showModalGroup(<?=$value['group_id']?>)">
+                                                <i class="ace-icon fa fa-pencil bigger-130"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="del-td">
+                                        <div class="action-buttons">
+                                            <a class="red" href="javascript:void(0);" onclick="delGroup(<?=$value['group_id']?>, '<?=$value['group_name']?>', this)">
+                                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?
+                            }
+                        }?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-lg-5">
+    <div class="widget-box loading-widget" id="menu_widget">
+        <div class="widget-header">
+            <h4 class="widget-title">Меню</h4>
+            <div class="widget-toolbar">
+                <a data-action="collapse" href="#">
+                    <i class="ace-icon fa fa-chevron-up"></i>
+                </a>
+            </div>
+            <div class="widget-toolbar">
+                <a data-action="add" href="javascript:void(0);" class="green" onclick="showModalMenu(0)">
+                    <i class="ace-icon fa fa-plus-circle fa-lg"></i>
+                </a>
+            </div>
+        </div>
+        <div class="widget-body" style="display: block;">
+            <div class="widget-main">
+                <div class="table-responsive">
+                    <table id="treegrid" class="table table-bordered no-margin-bottom">
+                        <colgroup>
+                            <col width="30px"></col>
+                            <col width="*"></col>
+                            <col width="70px"></col>
+                            <col width="50px"></col>
+                            <col width="30px"></col>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>Название</th>
+                            <th>Ссылка</th>
+                            <th>ID</th>
+                            <th>№</th>
+                            <th>#</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <!-- Optionally define a row that serves as template, when new nodes are created: -->
+                        <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-right"></td>
+                            <td class="text-right"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center">
+                                <div class="action-buttons" data-action="upd">
+                                    <a href="javascript:void(0);">
+                                        <i class="ace-icon fa fa-pencil bigger-130"></i>
+                                    </a>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="action-buttons" data-action="del">
+                                    <a class="red" href="javascript:void(0);">
+                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header no-padding">
+                <div class="table-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        <span class="white">&times;</span>
+                    </button>
+                    <span id="modal_header"></span>
+                </div>
+            </div>
+            <div id="modal_body"></div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        groupMenuJson(0);
+        groupGrantJson(0);
+
+        $("#treegrid").on("click", "div[data-action=upd]", function(e){
+            var node = $.ui.fancytree.getNode(e);
+            showModalMenu(node.data.menu_id);
+        });
+
+        $("#treegrid").on("click", "div[data-action=del]", function(e){
+            var node = $.ui.fancytree.getNode(e);
+            delMenu(node.data.menu_id, node.data.menu_name, '');
+        });
+
+        $("#grant_grid").on("click", "div[data-action=upd]", function(e){
+            var node = $.ui.fancytree.getNode(e);
+            showModalGrant(node.data.grant_id);
+        });
+
+        $("#grant_grid").on("click", "div[data-action=del]", function(e){
+            var node = $.ui.fancytree.getNode(e);
+            delGrant(node.data.grant_id, node.data.grant_name, '');
+        });
+    });
+
+    function showModalGroup(group_id){
+        $("#modal_header").empty();
+        $("#modal_body").empty();
+        if(group_id > 0){
+            $('#modal_header').append('Редактирование роли');
+        }else{
+            $('#modal_header').append('Добавление роли');
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/group-edit/group_id/" + group_id + "/",
+            async: true,
+            success: function(data){
+                $("#modal_body").html(data);
+            }
+        });
+        $(".modal").modal('show');
+    }
+
+    function delGroup(group_id, group_name, ob){
+        if (!confirm("Вы действительно хотите удалить роль " + group_name + " ?")) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/del-group/group_id/" + group_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    Notify.generate('Роль ' + group_name + ' удалена', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+
+    function showModalMenu(menu_id){
+        $("#modal_header").empty();
+        $("#modal_body").empty();
+        if(menu_id > 0){
+            $('#modal_header').append('Редактирование меню');
+        }else{
+            $('#modal_header').append('Добавление меню');
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/menu-edit/menu_id/" + menu_id + "/",
+            async: true,
+            success: function(data){
+                $("#modal_body").html(data);
+            }
+        });
+        $(".modal").modal('show');
+    }
+
+    function delMenu(menu_id, menu_name, ob){
+        if (!confirm("Вы действительно хотите удалить меню " + menu_name + " ?")) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/del-menu/menu_id/" + menu_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    Notify.generate('Меню ' + menu_name + ' удален', '', 1);
+                    $(ob).closest("tr").remove();
+                    groupMenuJson(0);
+                }
+            }
+        });
+    }
+
+    function showModalGrant(grant_id){
+        $("#modal_header").empty();
+        $("#modal_body").empty();
+        if(grant_id > 0){
+            $('#modal_header').append('Редактирование права');
+        }else{
+            $('#modal_header').append('Добавление права');
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/grant-edit/grant_id/" + grant_id + "/",
+            async: true,
+            success: function(data){
+                $("#modal_body").html(data);
+            }
+        });
+        $(".modal").modal('show');
+    }
+
+    function delGrant(grant_id, grant_name, ob){
+        if (!confirm("Вы действительно хотите удалить право " + grant_name + " ?")) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/del-grant/grant_id/" + grant_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    Notify.generate('Право ' + grant_name + ' удалено', '', 1);
+                    groupGrantJson(0);
+                }
+            }
+        });
+    }
+
+    function getGroupId(group_id, ob) {
+        $('#group_id').attr('value', group_id);
+        $('#reload_type').attr('value', 'all');
+        $('#group_table tbody tr').removeClass('selected-td');
+        $(ob).closest('tr').addClass('selected-td');
+        //menuReadByGroup(group_id);
+        groupGrantJson(group_id);
+        groupMenuJson(group_id);
+        statusReadByGroup(group_id);
+    }
+
+    function groupMenuLink(menu_id, ob) {
+        $('#reload_type').attr('value', 'menu');
+        var group_id = $('#group_id').val();
+        if(group_id == ''){
+            alert('Необходимо выбрать Роль!');
+            groupMenuJson(0);
+            $(ob).prop('checked', false);
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/group-menu-link/group_id/" + group_id + "/menu_id/" + menu_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    menuReadByGroup(group_id);
+                    groupMenuJson(group_id);
+                }
+            }
+        });
+    }
+
+    function menuReadByGroup(group_id) {
+        $.ajax({
+            type: 'POST',
+            async: true,
+            url: "/system/index-json/mode/menu-read-by-group/group_id/" + group_id,
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    //обновить checkbox в меню
+                    $.each(data.result.value, function(i,item){
+                        if(item.is_checked > 0){
+                            $("#menu_" + item.menu_id).prop("checked",true);
+                            $("#menu_" + item.menu_id).closest('tr').addClass('selected-td');
+                        }
+                        else{
+                            $("#menu_" + item.menu_id).prop("checked",false);
+                            $("#menu_" + item.menu_id).closest('tr').removeClass('selected-td');
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function groupGrantLink(grant_id, ob) {
+        $('#reload_type').attr('value', 'grant');
+        var group_id = $('#group_id').val();
+        if(group_id == ''){
+            alert('Необходимо выбрать Роль!');
+            groupGrantJson(0);
+            $(ob).prop('checked', false);
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/group-grant-link/group_id/" + group_id + "/grant_id/" + grant_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    grantReadByGroup(group_id);
+                }
+            }
+        });
+    }
+
+    function grantReadByGroup(group_id) {
+        $.ajax({
+            type: 'POST',
+            async: true,
+            url: "/system/index-json/mode/grant-read-by-group/group_id/" + group_id,
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    //обновить checkbox в меню
+                    $.each(data.result.value, function(i,item){
+                        if(item.is_checked > 0){
+                            $("#grant_" + item.grant_id).prop("checked",true);
+                            $("#grant_" + item.grant_id).closest('tr').addClass('selected-td');
+                        }
+                        else{
+                            $("#grant_" + item.grant_id).prop("checked",false);
+                            $("#grant_" + item.grant_id).closest('tr').removeClass('selected-td');
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function startReload() {
+        if($('#reload_type').val() == 'all'){
+            $('.loading-widget').widget_box('reload');
+            $('#reload_type').attr('value', '');
+        }else if($('#reload_type').val() == 'menu'){
+            $('#menu_widget').widget_box('reload');
+            $('#reload_type').attr('value', '');
+        }else if($('#reload_type').val() == 'grant'){
+            $('#grant_widget').widget_box('reload');
+            $('#reload_type').attr('value', '');
+        }else if($('#reload_type').val() == 'status'){
+            $('#status_widget').widget_box('reload');
+            $('#reload_type').attr('value', '');
+        }
+    }
+
+    function stopReload() {
+        $('.loading-widget').find('.widget-box-overlay').remove();
+        $('.loading-widget').removeClass('position-relative');
+    }
+
+    $(document).ajaxStart(function() {
+        startReload();
+    });
+
+    $(document).ajaxStop(function() {
+        stopReload();
+    });
+
+    function groupMenuJson(group_id){
+        $.ajax({
+            type: 'POST',
+            url: "/system/menu-list/mode/menu-json/",
+            data: {"group_id" : group_id},
+            async: true,
+            success: function(data){
+                if(data.result['status']){
+                    var newSourceOption = jQuery.parseJSON(data.result['value']);
+                    var treeOptions = {
+                        extensions: ["table"],
+                        checkbox: true,
+                        selectMode: 2,
+                        tooltip: true,
+                        table: {
+                            indentation: 15,      // indent 20px per node level
+                            nodeColumnIdx: 1,     // render the node title into the 2nd column
+                            checkboxColumnIdx: 0  // render the checkboxes into the 1st column
+                        },
+                        renderColumns: function(event, data) {
+                            var node = data.node,
+                                $tdList = $(node.tr).find(">td");
+                            $tdList.eq(2).text(node.data.action);
+                            $tdList.eq(3).text(node.data.menu_id);
+                            $tdList.eq(4).text(node.data.order_num);
+                            if(node.data.active_menu == 1){
+                                $tdList.eq(5).html('<i class="fa fa-check green"></i>');
+                            }else{
+                                $tdList.eq(5).html('');
+                            }
+                        }
+                    };
+
+                    $("#treegrid").fancytree(treeOptions);
+                    var tree = $('#treegrid').fancytree('getTree');
+                    tree.reload(newSourceOption);
+
+                    var tree_expanded = localStorage.getItem('tree_expanded');
+                    if($.trim(tree_expanded).length > 0){
+                        var numbersArray = tree_expanded.split(',');
+                        tree.visit(function(node){
+                            $.each($(numbersArray), function (i, item) {
+                                if('menu_id_' + node.data.menu_id == item){
+                                    node.setExpanded(true);
+                                }
+                            });
+                        });
+                    }
+                }
+            }
+        });
+    }
+    function groupGrantJson(group_id){
+        $.ajax({
+            type: 'POST',
+            url: "/system/menu-list/mode/grant-json/",
+            data: {"group_id" : group_id},
+            async: true,
+            success: function(data){
+                if(data.result['status']){
+                    var newSourceOption = jQuery.parseJSON(data.result['value']);
+                    var treeOptions = {
+                        extensions: ["table"],
+                        checkbox: true,
+                        selectMode: 2,
+                        table: {
+                            indentation: 15,      // indent 20px per node level
+                            nodeColumnIdx: 1,     // render the node title into the 2nd column
+                            checkboxColumnIdx: 0  // render the checkboxes into the 1st column
+                        },
+                        renderColumns: function(event, data) {
+                            var node = data.node,
+                                $tdList = $(node.tr).find(">td");
+                            $tdList.eq(2).text(node.data.grant_code);
+                            $tdList.eq(3).text(node.data.grant_id);
+                            $tdList.eq(4).text(node.data.order_num);
+                            if(node.data.active_grant == 1){
+                                $tdList.eq(5).html('<i class="fa fa-check green"></i>');
+                            }else{
+                                $tdList.eq(5).html('');
+                            }
+                        }
+                    };
+
+                    $("#grant_grid").fancytree(treeOptions);
+                    var tree = $('#grant_grid').fancytree('getTree');
+                    tree.reload(newSourceOption);
+
+                    var grant_expanded = localStorage.getItem('grant_expanded');
+                    if($.trim(grant_expanded).length > 0){
+                        var numbersArray = grant_expanded.split(',');
+                        tree.visit(function(node){
+                            $.each($(numbersArray), function (i, item) {
+                                if('grant_id_' + node.data.grant_id == item){
+                                    node.setExpanded(true);
+                                }
+                            });
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    var arr_expanded = [],
+        grant_expanded = [];
+    $(document).on('click', $('#treegrid'), function(event) {
+        var node = $.ui.fancytree.getNode(event),
+            // 'title' | 'prefix' | 'expander' | 'checkbox' | 'icon'
+            tt = $.ui.fancytree.getEventTargetType(event);
+        if(tt == 'checkbox'){
+            if(node.data.menu_id > 0){
+                groupMenuLink(node.data.menu_id, node.tr);
+            }
+        }
+        if(tt == 'expander'){
+            if(node.data.menu_id > 0){
+                if(node.expanded){
+                    arr_expanded.push('menu_id_' + node.data.menu_id);
+                    localStorage.setItem('tree_expanded', arr_expanded);
+                }else{
+                    arr_expanded.splice( $.inArray('menu_id_' + node.data.menu_id, arr_expanded) ,1);
+                    localStorage.setItem('tree_expanded', arr_expanded)
+                }
+            }
+        }
+    });
+    $(document).on('click', $('#grant_grid'), function(event) {
+        var node = $.ui.fancytree.getNode(event),
+            // 'title' | 'prefix' | 'expander' | 'checkbox' | 'icon'
+            tt = $.ui.fancytree.getEventTargetType(event);
+        if(tt == 'checkbox'){
+            if(node.data.grant_id > 0){
+                groupGrantLink(node.data.grant_id, node.tr);
+            }
+        }
+        if(tt == 'expander'){
+            if(node.data.grant_id > 0){
+                if(node.expanded){
+                    grant_expanded.push('grant_id_' + node.data.grant_id);
+                    localStorage.setItem('grant_expanded', grant_expanded);
+                }else{
+                    grant_expanded.splice( $.inArray('grant_id_' + node.data.grant_id, grant_expanded) ,1);
+                    localStorage.setItem('grant_expanded', grant_expanded)
+                }
+            }
+        }
+    });
+
+    function upd_status(status_id, what, ob) {
+        $('#reload_type').attr('value', 'status');
+        var group_id = $('#group_id').val();
+        if (group_id == '') {
+            alert('Необходимо выбрать Роль!');
+            statusReadByGroup(0);
+            $(ob).prop('checked', false);
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/upd-group-status/group_id/" + group_id + "/status_id/" + status_id + "/what/" + what + "/",
+            success: function (data) {
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else {
+                    statusReadByGroup(group_id);
+                }
+            }
+        });
+    }
+    function statusReadByGroup(group_id) {
+        $.ajax({
+            type: 'POST',
+            async: true,
+            url: "/system/index-json/mode/status-read-by-group/group_id/" + group_id,
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    //обновить checkbox в меню
+                    $.each(data.result.value, function(i,item){
+                        if(item.is_read_grant > 0){
+                            $("#status_read_" + item.status_id.toString()).prop("checked",true);
+                        }
+                        else{
+                            $("#status_read_" + item.status_id.toString()).prop("checked",false);
+                        }
+                        if(item.is_edit_grant > 0){
+                            $("#status_edit_" + item.status_id.toString()).prop("checked",true);
+                        }
+                        else{
+                            $("#status_edit_" + item.status_id.toString()).prop("checked",false);
+                        }
+                    });
+                }
+            }
+        });
+    }
+</script>

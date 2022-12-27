@@ -1,0 +1,42 @@
+<?
+if (isset($this->row['error'])) {?>
+    <div class="alert alert-danger">
+        <?=$this->row['error']?>
+    </div>
+    <?
+}?>
+<div class="modal-body">
+    <form id="work_doc_form">
+        <input type="hidden" name="work_id" value="<?=$this->work_id?>">
+        <input type="hidden" name="document_type_id" value="7">
+
+        <div class="form-group">
+            <label class="control-label " for="upload">Файл</label>
+            <div class="form-control no-padding">
+                <input type="file" name="upload" id="upload" >
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+    </form>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" onclick="work_upd_doc()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $(".date-picker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+5"
+        });
+    });
+</script>

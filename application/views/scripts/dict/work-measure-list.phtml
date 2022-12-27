@@ -1,0 +1,42 @@
+<div class="table-responsive">
+    <table class="table-local table-striped table-bordered hover-table no-margin-bottom no-border-top">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Высота</th>
+            <th>Ширина</th>
+            <th>Кол-во</th>
+            <th>Работник</th>
+            <th>Дата создания</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?
+        if(mycount($this->row) > 0){
+            $i = 1;
+            foreach ($this->row as $key => $value){
+                ?>
+                <tr>
+                    <td class="text-right"><?=$i?></td>
+                    <td class="text-center"><?=tenge_text($value['height'])?></td>
+                    <td class="text-center"><?=tenge_text($value['length'])?></td>
+                    <td class="text-center"><?=tenge_text($value['cnt'])?></td>
+                    <td class="text-left"><?=$value['fio']?></td>
+                    <td class="text-center"><?=$value['measure_date']?></td>
+                    <td class="text-left">
+                        <div class="action-buttons">
+                            <a class="red" <?if(getCurEmployee() != $value['employee_id']){?> style="display: none;" <?}?> href="javascript:void(0);" onclick="delMeasure(<?=$value['measure_id']?>, this)">
+                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <?
+                $i = $i + 1;
+            }
+        }
+        ?>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,55 @@
+<div class="table-responsive">
+    <table class="table-local table-striped table-bordered hover-table no-margin-bottom no-border-top">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Кол-во</th>
+            <th>Цена</th>
+            <th>Общая сумма</th>
+            <th>Работник</th>
+            <th>Дата создания</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?
+        if(mycount($this->row) > 0){
+            $i = 1;
+            $total_sum = 0;
+            foreach ($this->row as $key => $value){
+                ?>
+                <tr>
+                    <td class="text-right"><?=$i?></td>
+                    <td class="text-left"><?=$value['material_name']?></td>
+                    <td class="text-center"><?=tenge_text($value['cnt'])?></td>
+                    <td class="text-center"><?=tenge_text($value['price'])?></td>
+                    <td class="text-center"><?=tenge_text($value['total_price'])?></td>
+                    <td class="text-left"><?=$value['fio']?></td>
+                    <td class="text-center"><?=$value['furniture_date']?></td>
+                    <td class="text-left">
+                        <div class="action-buttons">
+                            <a class="red" <?if(getCurEmployee() != $value['employee_id']){?> style="display: none;" <?}?> href="javascript:void(0);" onclick="delFurniture(<?=$value['furniture_id']?>, this)">
+                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                            </a>
+                            <a class="blue" <?if(getCurEmployee() != $value['employee_id']){?> style="display: none;" <?}?> href="javascript:void(0);" onclick="showFurnitureForm(<?=$value['work_id']?>, <?=$value['furniture_id']?>, this)">
+                                <i class="ace-icon fa fa-edit bigger-130"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <?
+                $total_sum = $total_sum + $value['total_price'];
+                $i = $i + 1;
+            }?>
+            <tr>
+                <td class="text-right" colspan="4"><span style="font-weight: bold">Общая сумма</span></td>
+                <td class="text-right"><?=tenge_text($total_sum)?></td>
+                <td class="text-right" colspan="3"></td>
+            </tr>
+            <?
+        }
+        ?>
+        </tbody>
+    </table>
+</div>

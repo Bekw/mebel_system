@@ -1,0 +1,81 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Error Page</title>
+</head>
+<body style="background: #26769F;">
+
+<style>
+
+    select {
+        margin-top: 5px;
+        margin-bottom: 12px;
+        padding: 10px;
+    }
+
+    label.error {
+        padding-left:10px;
+        color: red;
+        font-style: italic;
+        font-size: 11px;
+    }
+
+    input.error {
+        color: red;
+    }
+
+    #problems img {
+        max-width: 480px;
+    }
+
+    .enter {
+        padding-top: 23px;
+        padding-left: 20px;
+        vertical-align: middle;
+    //display: block;
+        overflow: hidden;
+        width: 170px;
+    }
+
+
+    #error{
+        color:white;
+        font-family: arial;
+    }
+    #error .code{
+        font-size:200px;
+        font-weight:bold;
+    }
+    #error .message{
+
+    }
+    #error .description{
+        width:500px;
+    }
+    #error a:visited{
+        color:white;
+    }
+    #error a:link{
+        color:white;
+    }
+
+    .menu-active{
+        background-color: white;
+        color: black;
+    }
+
+    .window-content .my-button {
+        background: #2fa1c3;
+        color: #fff;
+        border: none;
+        padding: 5px 15px;
+    }
+</style>
+
+<table width="100%" height="100%" align="center" valign="center">
+    <tr>
+        <td><?=$this->layout()->content;?></td>
+    </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<div class="page-header">
+    <h1 class="pull-left">Ведение пользователей</h1>
+    <ul class="list-unstyled spaced list-inline pull-right no-margin-bottom">
+        <li class="no-margin">
+            <div class="action-buttons">
+                <a class="green" href="javascript:void(0);">
+                    <i class="ace-icon fa fa-key bigger-130"></i>
+                </a>
+                Сброс пароля
+            </div>
+        </li>
+        <li class="no-margin">
+            <div class="action-buttons">
+                <a class="red" href="javascript:void(0);">
+                    <i class="ace-icon fa fa-ban bigger-130"></i>
+                </a>
+                Блокирование пользователя
+            </div>
+        </li>
+        <li class="no-margin">
+            <div class="action-buttons">
+                <a class="green" href="javascript:void(0);">
+                    <i class="ace-icon fa fa-circle-o bigger-130"></i>
+                </a>
+                Разблокирование пользователя
+            </div>
+        </li>
+        <li class="no-margin">
+            <div class="action-buttons">
+                <a class="red" href="javascript:void(0);">
+                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                </a>
+                Удаление пользователя
+            </div>
+        </li>
+    </ul>
+    <div class="clearfix"></div>
+</div>
+<div class="clearfix"></div>
+<div class="btns-block pull-right">
+    <a href="javascript:void(0);" class="btn btn-xs btn-primary" data-toggle="collapse" data-target="#filters"><span id="filter_text">Показать</span> фильтры</a>
+    <a href="javascript:void(0);" class="btn btn-xs btn-primary" onclick="showModal(0)">Добавить пользователя</a>
+</div>
+<div class="clearfix"></div>
+<div class="collapse" id="filters">
+    <div class="panel panel-default no-margin">
+        <div class="panel-body">
+            <form method="post">
+                <div class="pull-left margin-right-10">
+                    <span class="input-icon">
+                        <input type="text" id="email" name="email" value="<?=$this->email?>" placeholder="Поиск по email..."/>
+                        <i class="ace-icon fa fa-at blue"></i>
+                    </span>
+                    <span class="input-icon">
+                        <input type="text" id="fio" name="fio" value="<?=$this->fio?>" placeholder="Поиск по ФИО..."/>
+                        <i class="ace-icon fa fa-user blue"></i>
+                    </span>
+                </div>
+                <button type="submit" name="search_employee" class="btn btn-primary btn-xs small-caps btn-height pull-left">
+                    <i class="ace-icon fa fa-search align-top bigger-125"></i>
+                    Поиск
+                </button>
+                <div class="clearfix"></div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="hr hr-10 dotted hr-double"></div>
+<div class="table-responsive">
+    <table class="table table-striped table-bordered hover-table no-margin-bottom no-border-top">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>ФИО</th>
+            <th>Email</th>
+            <th>Телефон</th>
+            <th>Пароль</th>
+            <th>Активный</th>
+            <th>Должность</th>
+            <th>Последний вход</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?
+        if(count($this->row) > 0){
+            foreach ($this->row as $key => $value) {
+                ?>
+                <tr>
+                    <td class="text-right"><?= $value['employee_id'] ?></td>
+                    <td class="text-left"><a href="javascript:void(0);"
+                                             onclick="showModal(<?= $value['employee_id'] ?>)"><?= $value['fio'] ?></a>
+                    </td>
+                    <td class="text-left"><?= $value['email'] ?></td>
+                    <td class="text-left"><?= $value['phone'] ?></td>
+                    <td class="text-left"><?= $value['passwd'] ?></td>
+                    <td class="text-left"><?= $value['is_active_text'] ?></td>
+                    <td class="text-left"><?= $value['position_name'] ?></td>
+                    <td class="text-center"><?= $value['last_login'] ?></td>
+                    <td>
+                        <div class="action-buttons">
+                            <a class="green" href="javascript:void(0);"
+                               onclick="resetPassword(<?= $value['employee_id'] ?>)">
+                                <i class="ace-icon fa fa-key bigger-130"></i>
+                            </a>
+                            <?
+                            if ($value['is_active'] > 0) {
+                                ?>
+                                <a class="red" href="javascript:void(0);"
+                                   onclick="blockEmployee(<?= $value['employee_id'] ?>, '<?= $value['fio'] ?>')">
+                                    <i class="ace-icon fa fa-ban bigger-130"></i>
+                                </a>
+                                <?
+                            } else {
+                                ?>
+                                <a class="green" href="javascript:void(0);"
+                                   onclick="unblockEmployee(<?= $value['employee_id'] ?>, '<?= $value['fio'] ?>')">
+                                    <i class="ace-icon fa fa-circle-o bigger-130"></i>
+                                </a>
+                                <?
+                            } ?>
+                            <a class="red" href="javascript:void(0);"
+                               onclick="delEmployee(<?= $value['employee_id'] ?>, '<?= $value['fio'] ?>', this)">
+                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <?
+            }
+        }
+        ?>
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        $('#filter_text').empty();
+        $('#modal').on('shown.bs.modal', function (e) {
+            $(document).keypress(function(e) {
+                var keycode = (e.keyCode ? e.keyCode : e.which);
+                if (keycode == '13') {
+                    updEmployee();
+                }
+            });
+        });
+
+        if($('#email').val().length > 0 || $('#fio').val().length > 0){
+            $('#filters').addClass('in');
+            $('#filter_text').append('Скрыть');
+        }else{
+            $('#filter_text').append('Показать');
+        }
+
+        $('#filters').on('shown.bs.collapse', function () {
+            $('#filter_text').empty();
+            $('#filter_text').append('Скрыть');
+        });
+
+        $('#filters').on('hidden.bs.collapse', function () {
+            $('#filter_text').empty();
+            $('#filter_text').append('Показать');
+        });
+    });
+
+    function blockEmployee(employee_id, fio){
+        if (!confirm("Вы действительно хотите заблокировать пользователя " + fio + " ?")) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/block-employee/employee_id/" + employee_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    Notify.generate('Пользоваьтель ' + fio + ' заблокирован', '', 1);
+                }
+            }
+        });
+    }
+
+    function unblockEmployee(employee_id, fio){
+        if (!confirm("Вы действительно хотите разблокировать пользователя " + fio + " ?")) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/unblock-employee/employee_id/" + employee_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    Notify.generate('Пользоваьтель ' + fio + ' разблокирован', '', 1);
+                }
+            }
+        });
+    }
+
+    function delEmployee(employee_id, fio, ob){
+        if (!confirm("Вы действительно хотите удалить пользователя " + fio + " ?")) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/del-employee/employee_id/" + employee_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    Notify.generate('Пользователь ' + fio + ' удален', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+
+    function resetPassword(employee_id){
+        if (!confirm("Вы действительно хотите сбросить пароль пользователя?")) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/system/index-json/mode/reset-password/",
+            data: {"employee_id" : employee_id},
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    Notify.generate('Пароль успешно сброшен', '', 1);
+                    window.location.href = window.location.href;
+                }
+            }
+        });
+    }
+
+    function showModal(employee_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-md');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Редактирование пользователя');
+        $.ajax({
+            type: 'POST',
+            url: "/system/employee-edit/",
+            data:{"employee_id" : employee_id},
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+</script>

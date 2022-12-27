@@ -1,0 +1,1101 @@
+<?
+if (strlen($this->globalError) > 0) {?>
+    <div class="alert alert-danger">
+        <?=$this->globalError?>
+    </div>
+    <?
+}?>
+<?
+    $is_hiden_measure = 'none';
+    if(in_array(getCurPositionCode(), array('ADMIN', 'tehnolog'))){
+        $is_hiden_measure = '';
+    }
+?>
+<div class="alert alert-info">
+    <div style="float:left; margin-right: 40px;">
+        <p>Работа: <?=$this->row['work_name']?></p>
+        <p>Тип мебели: <?=$this->row['work_type_name']?></p>
+        <p>Дата замера: <?=$this->row['measure_time']?></p>
+
+    </div>
+    <div style="float:left; margin-right: 40px;">
+        <p>ФИО: <?=$this->row['client_fio']?></p>
+        <p>Адрес: <?=$this->row['address']?></p>
+        <p>Телефон клиента: <?=$this->row['client_phone']?></p>
+    </div>
+    <?if(in_array(getCurPositionCode(), array('ADMIN', 'Brigadir', 'Manager'))){?>
+    <div style="float:left; margin-right: 40px;">
+        <a href="/dict/request-edit/request_id/<?=$this->row['request_id']?>">
+            <button class="btn btn-minier btn-yellow">Заявка</button>
+        </a>
+    </div>
+    <?}?>
+    <div class="clearfix"></div>
+</div>
+<div class="tabs hidden main-tabs">
+    <ul class="nav nav-tabs" id="tabs">
+        <li><a data-toggle="tab" data-target="#common">Общее</a></li>
+        <li><a data-toggle="tab" data-target="#stage">Этапы</a></li>
+        <li><a data-toggle="tab" data-target="#measure">Замеры</a></li>
+        <li><a data-toggle="tab" data-target="#docs">Документы</a></li>
+        <li><a data-toggle="tab" data-target="#comments">Комментарий</a></li>
+        <li><a data-toggle="tab" data-target="#design">Дизайнер</a></li>
+        <li><a data-toggle="tab" data-target="#provider_requests">Заявки поставщику</a></li>
+    </ul>
+</div>
+<div class="tab-content">
+    <div id="common" class="tab-pane fade">
+        <div class="col-lg-5 col-md-6 col-sm-7">
+            <form method="post">
+                <div class="row">
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <div class="form-group">
+                            <label class="control-label " for="tehnolog_id">Технолог</label>
+                            <div class="form-control no-padding">
+                                <select class="chosen-select form-control" id="tehnolog_id" data-placeholder="Выберите технолога..." name="tehnolog_id">
+                                    <option value="0"> </option>
+                                    <?
+                                    if(mycount($this->row_tehnolog) > 0){
+                                        foreach ($this->row_tehnolog as $key => $value){?>
+                                            <option value="<?=$value['employee_id']?>" <?if($this->row['tehnolog_id'] == $value['employee_id']){echo ' selected'; echo ' style="font-weight: bold; font-size: 14px;"';}?>><?=$value['fio']?></option>
+                                            <?
+                                        }
+                                    }?>
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <div class="form-group">
+                            <label class="control-label " for="ldsp_employee_id">ЛДСП распиловщик</label>
+                            <div class="form-control no-padding">
+                                <select class="chosen-select form-control" id="ldsp_employee_id" data-placeholder="Выберите ЛДСП распиловщика..." name="ldsp_employee_id">
+                                    <option value="0"> </option>
+                                    <?
+                                    if(mycount($this->row_ldsp) > 0){
+                                        foreach ($this->row_ldsp as $key => $value){?>
+                                            <option value="<?=$value['employee_id']?>" <?if($this->row['ldsp_employee_id'] == $value['employee_id']){echo ' selected'; echo ' style="font-weight: bold; font-size: 14px;"';}?>><?=$value['fio']?></option>
+                                            <?
+                                        }
+                                    }?>
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <div class="form-group">
+                            <label class="control-label " for="multicat_employee_id">Мультикамщик</label>
+                            <div class="form-control no-padding">
+                                <select class="chosen-select form-control" id="multicat_employee_id" data-placeholder="Выберите мультикамщика..." name="multicat_employee_id">
+                                    <option value="0"> </option>
+                                    <?
+                                    if(mycount($this->row_multicat) > 0){
+                                        foreach ($this->row_multicat as $key => $value){?>
+                                            <option value="<?=$value['employee_id']?>" <?if($this->row['multicat_employee_id'] == $value['employee_id']){echo ' selected'; echo ' style="font-weight: bold; font-size: 14px;"';}?>><?=$value['fio']?></option>
+                                            <?
+                                        }
+                                    }?>
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <div class="form-group">
+                            <label class="control-label " for="stolyar_employee_id">Столяр</label>
+                            <div class="form-control no-padding">
+                                <select class="chosen-select form-control" id="stolyar_employee_id" data-placeholder="Выберите столяра..." name="stolyar_employee_id">
+                                    <option value="0"> </option>
+                                    <?
+                                    if(mycount($this->row_stolyar) > 0){
+                                        foreach ($this->row_stolyar as $key => $value){?>
+                                            <option value="<?=$value['employee_id']?>" <?if($this->row['stolyar_employee_id'] == $value['employee_id']){echo ' selected'; echo ' style="font-weight: bold; font-size: 14px;"';}?>><?=$value['fio']?></option>
+                                            <?
+                                        }
+                                    }?>
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <div class="form-group">
+                            <label class="control-label " for="master_id">Мастер</label>
+                            <div class="form-control no-padding">
+                                <select class="chosen-select form-control" id="master_id" data-placeholder="Выберите мастера..." name="master_id">
+                                    <option value="0"> </option>
+                                    <?
+                                    if(mycount($this->row_master) > 0){
+                                        foreach ($this->row_master as $key => $value){?>
+                                            <option value="<?=$value['employee_id']?>" <?if($this->row['master_id'] == $value['employee_id']){echo ' selected'; echo ' style="font-weight: bold; font-size: 14px;"';}?>><?=$value['fio']?></option>
+                                            <?
+                                        }
+                                    }?>
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <div class="form-group">
+                            <label class="control-label " for="grinder_employee_id">Шлифовщик</label>
+                            <div class="form-control no-padding">
+                                <select class="chosen-select form-control" id="grinder_employee_id" data-placeholder="Выберите шлифовщика..." name="grinder_employee_id">
+                                    <option value="0"> </option>
+                                    <?
+                                    if(mycount($this->row_shlif) > 0){
+                                        foreach ($this->row_shlif as $key => $value){?>
+                                            <option value="<?=$value['employee_id']?>" <?if($this->row['grinder_employee_id'] == $value['employee_id']){echo ' selected'; echo ' style="font-weight: bold; font-size: 14px;"';}?>><?=$value['fio']?></option>
+                                            <?
+                                        }
+                                    }?>
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <div class="form-group">
+                            <label class="control-label " for="malyar_employee_id">Маляр</label>
+                            <div class="form-control no-padding">
+                                <select class="chosen-select form-control" id="malyar_employee_id" data-placeholder="Выберите маляра..." name="malyar_employee_id">
+                                    <option value="0"> </option>
+                                    <?
+                                    if(mycount($this->row_malyar) > 0){
+                                        foreach ($this->row_malyar as $key => $value){?>
+                                            <option value="<?=$value['employee_id']?>" <?if($this->row['malyar_employee_id'] == $value['employee_id']){echo ' selected'; echo ' style="font-weight: bold; font-size: 14px;"';}?>><?=$value['fio']?></option>
+                                            <?
+                                        }
+                                    }?>
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <div class="form-group">
+                            <label class="control-label " for="collector_employee_id">Упаковщик</label>
+                            <div class="form-control no-padding">
+                                <select class="chosen-select form-control" id="collector_employee_id" data-placeholder="Выберите упаковщика..." name="collector_employee_id">
+                                    <option value="0"> </option>
+                                    <?
+                                    if(mycount($this->row_upack) > 0){
+                                        foreach ($this->row_upack as $key => $value){?>
+                                            <option value="<?=$value['employee_id']?>" <?if($this->row['collector_employee_id'] == $value['employee_id']){echo ' selected'; echo ' style="font-weight: bold; font-size: 14px;"';}?>><?=$value['fio']?></option>
+                                            <?
+                                        }
+                                    }?>
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <div class="form-group">
+                            <label class="control-label " for="delivery_employee_id">Доставщик</label>
+                            <div class="form-control no-padding">
+                                <select class="chosen-select form-control" id="delivery_employee_id" data-placeholder="Выберите доставщика..." name="delivery_employee_id">
+                                    <option value="0"> </option>
+                                    <?
+                                    if(mycount($this->row_delivery) > 0){
+                                        foreach ($this->row_delivery as $key => $value){?>
+                                            <option value="<?=$value['employee_id']?>" <?if($this->row['delivery_employee_id'] == $value['employee_id']){echo ' selected'; echo ' style="font-weight: bold; font-size: 14px;"';}?>><?=$value['fio']?></option>
+                                            <?
+                                        }
+                                    }?>
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <div class="form-group">
+                            <label class="control-label " for="ustan_employee_id">Установщик</label>
+                            <div class="form-control no-padding">
+                                <select class="chosen-select form-control" id="ustan_employee_id" data-placeholder="Выберите доставщика..." name="ustan_employee_id">
+                                    <option value="0"> </option>
+                                    <?
+                                    if(mycount($this->row_ustan) > 0){
+                                        foreach ($this->row_ustan as $key => $value){?>
+                                            <option value="<?=$value['employee_id']?>" <?if($this->row['ustan_employee_id'] == $value['employee_id']){echo ' selected'; echo ' style="font-weight: bold; font-size: 14px;"';}?>><?=$value['fio']?></option>
+                                            <?
+                                        }
+                                    }?>
+                                </select>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <?if(in_array(getCurPositionCode(), array('ADMIN', 'Brigadir'))){?>
+                        <button type="submit" class="btn btn-success pull-right"  name="save_common">Сохранить</button>
+                    <?}?>
+                </div>
+            </form>
+        </div>
+        <div id="mark_list">
+            <!--            Статусы по этапам-->
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div id="stage" class="tab-pane fade">
+        <?if($this->row['stage_item_id'] == 2 && in_array(getCurPositionCode(), array('ADMIN', 'Brigadir'))){?>
+            <a href="javascript:void(0)" onclick="acceptStage(3)" class="btn btn-success btn-xs pull-right" style="margin-left: 5px;">Принять работу</a>
+
+            <a href="javascript:void(0)" onclick="acceptStage(2)" class="btn btn-danger btn-xs pull-right" style="margin-left: 5px;">На доработку</a>
+            <?
+        }?>
+
+        <?if(in_array($this->row['stage_item_id'], array(1, 3)) && $this->row['stage_id'] > 2){?>
+            <a href="javascript:void(0)" onclick="acceptStage(1)" class="btn btn-primary btn-xs pull-right" style="margin-left: 5px;">Сдать работу</a>
+            <?
+        }?>
+        <?if(in_array(getCurPositionCode(), array('ADMIN', 'Brigadir'))){?>
+            <a href="javascript:void(0)" onclick="showStageForm(<?=$this->work_id?>)" class="btn btn-info btn-xs pull-right">Изменить этап</a>
+            <div class="clearfix"></div>
+            <hr>
+            <?
+        }?>
+        <div class="clearfix"></div>
+        <hr>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered hover-table no-margin-bottom no-border-top">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Этап</th>
+                    <th>Статус</th>
+                    <th>Работник</th>
+                    <th>Дата</th>
+                    <th>Комментарий</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?
+                if(mycount($this->row_stage) > 0){
+                    $i = 1;
+                    foreach ($this->row_stage as $key => $value){
+                        ?>
+                        <tr style="background-color: <?=$value['color']?>">
+                            <td class="text-right"><?=$i?></td>
+                            <td class="text-left"><?=$value['stage_name']?></td>
+                            <td class="text-left"><?=$value['stage_item_name']?></td>
+                            <td class="text-left"><?=$value['fio']?></td>
+                            <td class="text-center"><?=$value['stage_date']?></td>
+                            <td class="text-left"><?=$value['comment']?></td>
+                        </tr>
+                        <?
+                        $i = $i + 1;
+                    }
+                }
+                ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="measure" class="tab-pane fade">
+        <div class="tabs hidden main-tabs">
+            <ul class="nav nav-tabs" id="tabs">
+                <li><a data-toggle="tab" data-target="#settings">Общее</a></li>
+                <li><a data-toggle="tab" data-target="#measure_ldsp">Деталировка ЛДСП</a></li>
+                <li><a data-toggle="tab" data-target="#measure_facade">Деталировка МДФ</a></li>
+                <li><a data-toggle="tab" data-target="#measure_lhdf">Деталировка ЛХДФ</a></li>
+                <li><a data-toggle="tab" data-target="#furniture">Фурнитура</a></li>
+            </ul>
+        </div>
+        <div class="tab-content">
+            <div id="settings" class="tab-pane fade">
+                <a href="javascript:void(0)" onclick="showItemForm(<?=$this->work_id?>, 0)"  style="display: <?=$is_hiden_measure?>" class="btn btn-info btn-xs pull-right">Добавить работу</a>
+                <a href="javascript:void(0)" onclick="showDocMeasureForm(<?=$this->work_id?>)" style="margin-right: 5px;" class="btn btn-primary btn-xs pull-right">Контрольный замер</a>
+                <div class="clearfix"></div>
+                <hr>
+                <h4>Контрольный замер</h4>
+                <div class="table-responsive">
+                    <table class="table-local table-striped table-bordered hover-table no-margin-bottom no-border-top">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Работник</th>
+                            <th>Дата создания</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?
+                        if(mycount($this->row_control_measure) > 0){
+                            $i = 1;
+                            foreach ($this->row_control_measure as $key => $doc){
+                                ?>
+                                <tr>
+                                    <td class="text-right"><?=$i?></td>
+                                    <td class="text-left"><?=$doc['document_name']?></td>
+                                    <td class="text-left"><?=$doc['fio']?></td>
+                                    <td class="text-center"><?=$doc['doc_date']?></td>
+                                    <td class="text-left">
+                                        <div class="action-buttons">
+                                            <a href="<?=$doc['document_url']?>" title="Скачать" target="_blank" download="download">
+                                                <i class="fa fa-download" aria-hidden="true">
+                                                </i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?
+                                $i = $i + 1;
+                            }
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+                <hr>
+                <div id="items">
+
+                </div>
+
+            </div>
+            <div id="measure_ldsp" class="tab-pane fade">
+                <form method="post">
+                    <a href="javascript:void(0)" onclick="showMeasureForm(<?=$this->work_id?>, 1)"  style="display: <?=$is_hiden_measure?>; height: 34px;" class="btn btn-info btn-xs pull-right">Добавить замер</a>
+                    <button type="submit" name="print" style="margin-top: 0px; margin-right: 5px; " class="btn btn-primary btn-xs small-caps btn-height pull-right for-with-label">
+                        <i class="ace-icon fa fa-print align-top bigger-125"></i>
+                        Печать
+                    </button>
+                </form>
+                <div class="clearfix"></div>
+                <hr>
+                <div id="item_ldsp">
+
+                </div>
+                <hr>
+                <form id="total_ldsp">
+                    <div class="row">
+                        <input type="hidden" name="work_id" value="<?=$this->work_id?>">
+                        <div class="col-lg-6">
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="ldsp_cnt">Кол-во ЛДСП</label>
+                                    <input type="number" step="any" class="form-control" name="ldsp_cnt" value="<?=$this->row['ldsp_cnt']?>" id="ldsp_cnt">
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="ldsp_color">Цвет ЛДСП</label>
+                                    <input type="text" class="form-control" name="ldsp_color" value="<?=$this->row['ldsp_color']?>" id="ldsp_color">
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="pvh">ПВХ</label>
+                                    <input type="number" step="any" class="form-control" name="pvh" value="<?=$this->row['pvh']?>" id="pvh">
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <button type="button" class="btn btn-sm btn-success"  style="display: <?=$is_hiden_measure?>" onclick="work_ldsp_upd()">
+                                    <i class="ace-icon fa fa-check"></i>
+                                    Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="measure_facade" class="tab-pane fade">
+                <form method="post">
+                    <a href="javascript:void(0)" onclick="showMeasureForm(<?=$this->work_id?>, 2)"  style="display: <?=$is_hiden_measure?>; height: 34px;" class="btn btn-info btn-xs pull-right">Добавить замер</a>
+                    <button type="submit" name="print_mdf" style="margin-top: 0px; margin-right: 5px; " class="btn btn-primary btn-xs small-caps btn-height pull-right for-with-label">
+                        <i class="ace-icon fa fa-print align-top bigger-125"></i>
+                        Печать
+                    </button>
+                </form>
+                <div class="clearfix"></div>
+                <hr>
+                <div id="item_facade">
+
+                </div>
+                <div class="clearfix"></div>
+                <hr>
+
+                <form id="total_measure">
+                    <div class="row">
+                        <input type="hidden" name="work_id" value="<?=$this->work_id?>">
+                        <div class="col-lg-6">
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="mdf_total">Общий м2</label>
+                                    <input type="number" step="any" class="form-control" name="mdf_total" value="<?=$this->row['mdf_total']?>" id="mdf_total">
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="color_type">Цвет краски</label>
+                                    <input type="text" class="form-control" name="color_type" value="<?=$this->row['color_type']?>" id="color_type">
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="patina">Патина</label>
+                                    <input type="text" class="form-control" name="patina" value="<?=$this->row['patina']?>" id="patina">
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="color_consumption">Расход краски</label>
+                                    <input type="number" step="any" class="form-control" name="color_consumption" value="<?=$this->row['color_consumption']?>" id="color_consumption">
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="grunt_consumption">Расход грунта</label>
+                                    <input type="number" step="any" class="form-control" name="grunt_consumption" value="<?=$this->row['grunt_consumption']?>" id="grunt_consumption">
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="lak_consumption">Расход лак</label>
+                                    <input type="number" step="any" class="form-control" name="lak_consumption" value="<?=$this->row['lak_consumption']?>" id="lak_consumption">
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <button type="button" class="btn btn-sm btn-success"  style="display: <?=$is_hiden_measure?>" onclick="work_total_measure_upd()">
+                                    <i class="ace-icon fa fa-check"></i>
+                                    Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="measure_lhdf" class="tab-pane fade">
+                <form method="post">
+                    <a href="javascript:void(0)" onclick="showMeasureForm(<?=$this->work_id?>, 3)"  style="display: <?=$is_hiden_measure?>; height: 34px;" class="btn btn-info btn-xs pull-right">Добавить замер</a>
+                    <button type="submit" name="print_lhdf" style="margin-top: 0px; margin-right: 5px; " class="btn btn-primary btn-xs small-caps btn-height pull-right for-with-label">
+                        <i class="ace-icon fa fa-print align-top bigger-125"></i>
+                        Печать
+                    </button>
+                </form>
+                <div class="clearfix"></div>
+                <hr>
+                <div id="item_lhdf">
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div id="furniture" class="tab-pane fade">
+                <a href="javascript:void(0)" onclick="showFurnitureForm(<?=$this->work_id?>, 0)"  style="display: <?=$is_hiden_measure?>" class="btn btn-info btn-xs pull-right">Добавить фурнитуру</a>
+                <div class="clearfix"></div>
+                <hr>
+                <div id="item_furniture">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="docs" class="tab-pane fade">
+        <a href="javascript:void(0)" onclick="showDocWorkForm(<?=$this->work_id?>)" class="btn btn-info btn-xs pull-right">Добавить документ</a>
+        <div class="clearfix"></div>
+        <hr>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered hover-table no-margin-bottom no-border-top">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Тип</th>
+                    <th>Название</th>
+                    <th>Работник</th>
+                    <th>Дата создания</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?
+                if(mycount($this->row_doc) > 0){
+                    $i = 1;
+                    foreach ($this->row_doc as $key => $doc){
+                        ?>
+                        <tr>
+                            <td class="text-right"><?=$i?></td>
+                            <td class="text-left"><?=$doc['doc_type']?></td>
+                            <td class="text-left"><?=$doc['document_name']?></td>
+                            <td class="text-left"><?=$doc['fio']?></td>
+                            <td class="text-center"><?=$doc['doc_date']?></td>
+                            <td class="text-left">
+                                <div class="action-buttons">
+                                    <a href="<?=$doc['document_url']?>" title="Скачать" target="_blank" download="download">
+                                        <i class="fa fa-download" aria-hidden="true">
+                                        </i>
+                                    </a>
+                                    <a class="red" href="javascript:void(0);"  <?if(getCurEmployee() != $doc['employee_id']){?> style="display: none;" <?}?> onclick="delDocument(<?=$doc['document_id']?>, this)">
+                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?
+                        $i = $i + 1;
+                    }
+                }
+                ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="comments" class="tab-pane fade">
+        <a href="javascript:void(0)" onclick="showCommentForm(<?=$this->work_id?>)" class="btn btn-info btn-xs pull-right">Добавить</a>
+        <div class="clearfix"></div>
+        <hr>
+        <div id="comment_list">
+
+        </div>
+    </div>
+    <div id="design" class="tab-pane fade">
+       <h4>Правки по дизайну</h4>
+        <form method="post">
+            <div class="clearfix"></div>
+            <div class="form-group">
+                <textarea id="designer_comment" name="designer_comment" style="height: 200px;" class="autosize-transition form-control"><?=$this->row['designer_comment']?></textarea>
+            </div>
+            <div class="clearfix"></div>
+            <?if(in_array(getCurPositionCode(), array('ADMIN', 'Designer'))){?>
+                <button type="submit"  class="btn btn-success pull-right"  name="save_design">Сохранить</button>
+            <?}?>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+    <div id="provider_requests" class="tab-pane fade">
+        <a href="/dict/provider-request-edit/work_id/<?=$this->work_id?>" class="btn btn-info btn-xs pull-right">Добавить</a>
+        <div class="clearfix"></div>
+        <hr>
+        <?
+        if(mycount($this->row_provider_request) > 0){
+            foreach ($this->row_provider_request as $key => $value){
+                $ob = new Application_Model_DbTable_Dict();
+                $row_item = $ob->read_provider_request_item($value['provider_request_id'])['value'];
+            ?>
+                <div style="margin-bottom: 15px;">
+                    <table class="table table-striped table-bordered hover-table no-margin-bottom no-border-top">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th >Материал</th>
+                            <th>Кол-во</th>
+                            <th>Цена</th>
+                            <th>Общее</th>
+                            <th>Статус</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr style="background-color: #a1dbec">
+                            <th colspan="6">
+
+                                <div style="float:left; margin-right: 40px;">
+                                    <p>Поставщик: <?=$value['provider_name']?></p>
+                                    <p>Кто добавил: <?=$value['fio']?></p>
+                                    <p>Дата отгрузки: <?=$value['delivery_date']?></p>
+
+                                </div>
+                                <div style="float:left; margin-right: 40px;">
+                                    <p>Адрес: <?=$value['address']?></p>
+                                    <p>Дата создания: <?=$value['request_date']?></p>
+                                </div>
+                            </th>
+                        </tr>
+                        <?
+                        if(mycount($row_item) > 0){
+                            $i = 1;
+                            $total_price = 0;
+                                ?>
+                            <?
+                            foreach ($row_item as $key => $doc){
+                                $total_price = $total_price + $doc['total'];
+                                ?>
+                                <tr>
+                                    <td class="text-right" ><?=$i?></td>
+                                    <td class="text-left" ><?=$doc['material_name']?></td>
+                                    <td class="text-right"><?=tenge_text($doc['cnt'])?></td>
+                                    <td class="text-right"><?=tenge_text($doc['price'])?></td>
+                                    <td class="text-right"><?=tenge_text($doc['total'])?></td>
+                                    <td class="text-center">
+                                        <select onchange="saveStatus(<?=$doc['provider_request_item_id']?>, this)">
+                                            <option value="1" <?if($doc['status_id'] == 1){?>selected<?}?>>Создан</option>
+                                            <option value="2" <?if($doc['status_id'] == 2){?>selected<?}?>>В наличии</option>
+                                            <option value="3" <?if($doc['status_id'] == 3){?>selected<?}?>>Нет в наличии</option>
+                                            <option value="4" <?if($doc['status_id'] == 4){?>selected<?}?>>Отгружен</option>
+
+                                        </select>
+                                    </td>
+                                </tr>
+                                <?
+                                $i = $i + 1;
+                            }
+                        }
+                        ?>
+                            <tr>
+                                <td class="text-center" colspan="4"></td>
+                                <td class="text-right"><span style="font-weight: bold"><?=tenge_text($total_price)?></span></td>
+                                <td class="text-center"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="clearfix"></div>
+                <?
+            }
+        }
+        ?>
+
+    </div>
+</div>
+<?=$this->partial('dict/modal-container.phtml');?>
+
+<script type="text/javascript">
+    $( document ).ready(function() {
+        $(function() {
+            var lastTab = localStorage.getItem('lastTab');
+            $('.tabs, .tab-content').removeClass('hidden');
+            if (lastTab) {
+                $('[data-target="' + lastTab + '"]').tab('show');
+                $('.measure-tabs a:first').tab('show');
+            }else{
+                $('.main-tabs a:first').tab('show');
+            }
+            $('.main-tabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                localStorage.setItem('lastTab', $(this).data('target'));
+                $('.measure-tabs a:first').tab('show');
+            });
+        });
+        $(".group1").colorbox({
+            rel:'group1',
+            photo:true,
+            previous:'<i class="ace-icon fa fa-arrow-left"></i>',
+            next:'<i class="ace-icon fa fa-arrow-right"></i>',
+            close:'&times;',
+            scalePhotos: true,
+            scrolling:false,
+            maxWidth: '100%',
+            maxHeight:'100%',
+            width: '50%',
+            weight:'50%',
+            reposition:true,
+            onOpen:function(){
+                $overflow = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+            },
+            onClosed:function(){
+                document.body.style.overflow = $overflow;
+            },
+            onComplete:function(){
+                $.colorbox.resize();
+            }
+        });
+    });
+
+    $('#items').load('/dict/work-item-list/work_id/<?=$this->work_id?>');
+    $('#item_ldsp').load('/dict/work-measure-list/work_id/<?=$this->work_id?>/measure_type_id/1');
+    $('#item_facade').load('/dict/work-measure-list/work_id/<?=$this->work_id?>/measure_type_id/2');
+    $('#item_lhdf').load('/dict/work-measure-list/work_id/<?=$this->work_id?>/measure_type_id/3');
+    $('#item_furniture').load('/dict/work-furniture-list/work_id/<?=$this->work_id?>');
+    $('#mark_list').load('/dict/work-mark-list/work_id/<?=$this->work_id?>');
+    $('#comment_list').load('/dict/work-comment-list/work_id/<?=$this->work_id?>');
+
+    function showItemForm(work_id, work_item_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Редактирование');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-item-edit/",
+            data: {
+                "work_id" : work_id,
+                "work_item_id" : work_item_id
+            },
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+    function showStageForm(work_id,){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Редактирование');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-stage-edit/",
+            data: {
+                "work_id" : work_id
+            },
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+
+    function work_item_upd(){
+        var fd = new FormData($("#item_work")[0]);
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/upd-item/",
+            data: fd,
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при добавлении', '', 3);
+                } else{
+                    $(".modal").modal('hide');
+                    Notify.generate('Успешно', '', 1);
+                    $('#items').load('/dict/work-item-list/work_id/<?=$this->work_id?>');
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+
+    function saveStatus(provider_request_item_id, ob){
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/upd-status-provider/",
+            data: {provider_request_item_id : provider_request_item_id, status_id : ob.value},
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при изменении', '', 3);
+                } else{
+                    Notify.generate('Успешно', '', 1);
+                }
+            }
+        });
+    }
+
+    function acceptStage(is_accept){
+        $.ajax({
+            type: 'POST',
+            url: "/dict/index-json/mode/upd_work_stage/",
+            data: {
+                "is_accept" : is_accept,
+                "work_id" : <?=$this->work_id?>
+            },
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка', '', 3);
+                } else{
+                    Notify.generate('Успешно', '', 1);
+                    location.reload();
+                }
+            }
+        });
+    }
+
+    function delItem(work_item_id, ob){
+        if (!confirm('Вы действительно хотите удалить данную работу?')) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/del-item/work_item_id/" + work_item_id + "/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.result['error']);
+                }
+                else{
+                    Notify.generate('Работа удалена', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+
+    function showMeasureForm(work_id, measure_type_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Редактирование');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-measure-edit/",
+            data: {
+                "work_id" : work_id,
+                "measure_type_id" : measure_type_id
+            },
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+    function showFurnitureForm(work_id, furniture_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Редактирование');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-furniture-edit/",
+            data: {
+                "work_id" : work_id,
+                "furniture_id" : furniture_id
+            },
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+
+    function work_measure_upd(measure_type_id){
+        var fd = new FormData($("#measure_item")[0]);
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/upd-measure/",
+            data: fd,
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при добавлении', '', 3);
+                } else{
+                    $(".modal").modal('hide');
+                    Notify.generate('Успешно', '', 1);
+                    if(measure_type_id == 1){
+                        $('#item_ldsp').load('/dict/work-measure-list/work_id/<?=$this->work_id?>/measure_type_id/1');
+                    }else if(measure_type_id == 2){
+                        $('#item_facade').load('/dict/work-measure-list/work_id/<?=$this->work_id?>/measure_type_id/2');
+                    }else{
+                        $('#item_lhdf').load('/dict/work-measure-list/work_id/<?=$this->work_id?>/measure_type_id/3');
+                    }
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+
+    function work_furniture_upd(){
+        var fd = new FormData($("#furniture_form")[0]);
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/upd-furniture/",
+            data: fd,
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при добавлении', '', 3);
+                } else{
+                    $(".modal").modal('hide');
+                    Notify.generate('Успешно', '', 1);
+                    $('#item_furniture').load('/dict/work-furniture-list/work_id/<?=$this->work_id?>/');
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+    function work_total_measure_upd(){
+        var fd = new FormData($("#total_measure")[0]);
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/upd-total-measure/",
+            data: fd,
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при добавлении', '', 3);
+                } else{
+                    Notify.generate('Успешно', '', 1);
+                    location.reload();
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+    function work_ldsp_upd(){
+        var fd = new FormData($("#total_ldsp")[0]);
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/upd-ldsp/",
+            data: fd,
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при добавлении', '', 3);
+                } else{
+                    Notify.generate('Успешно', '', 1);
+                    location.reload();
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+
+    function delMeasure(measure_id, ob){
+        if (!confirm('Вы действительно хотите удалить данный замер?')) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/del-measure/measure_id/" + measure_id + "/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.result['error']);
+                }
+                else{
+                    Notify.generate('Замер удален', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+
+    function delFurniture(furniture_id, ob){
+        if (!confirm('Вы действительно хотите удалить данную фурнитуру?')) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/del-furniture/furniture_id/" + furniture_id + "/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.result['error']);
+                }
+                else{
+                    Notify.generate('Замер удален', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+
+    function showDocWorkForm(work_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Добавить документы');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/document-edit-work/",
+            data: {"work_id" : work_id,},
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+    function showDocMeasureForm(work_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Добавить контрольный замер');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/document-measure-work/",
+            data: {"work_id" : work_id,},
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+    function showCommentForm(work_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-md');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Добавить комментарий');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-comment-edit/",
+            data: {"work_id" : work_id,},
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+    function work_upd_doc(){
+        var fd = new FormData($("#work_doc_form")[0]);
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/upd-doc/",
+            data: fd,
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при добавлении файла', '', 3);
+                } else{
+                    $(".modal").modal('hide');
+                    Notify.generate('Файл загружен успешно', '', 1);
+                    location.reload();
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+    function delDocument(document_id, ob){
+        if (!confirm('Вы действительно хотите удалить данный документ?')) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/del-doc/document_id/" + document_id + "/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.result['error']);
+                }
+                else{
+                    Notify.generate('Документ удален', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+</script>

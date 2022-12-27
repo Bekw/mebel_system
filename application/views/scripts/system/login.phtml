@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml' lang='ru-ru' xml:lang='ru-ru' >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Вход в кредитный конвейер </title>
+    <link rel='stylesheet' type='text/css' href='/version_2.0/ace_admin/assets/css/login.css' />
+    <link rel="stylesheet" href="/version_2.0/ace_admin/assets/css/font-awesome.css">
+
+    <meta name='robots' content='NONE,NOARCHIVE' />
+    <!--    <script src="/js/jquery-1.7.2.min.js"></script>-->
+    <script src="/version_2.0/ace_admin/assets/js/jquery-1.11.3.min.js"></script>
+
+    <script src="/version_2.0/ace_admin/assets/js/bootstrap.min.js"></script>
+    <script src="/version_2.0/ace_admin/assets/js/ace-elements.min.js"></script>
+    <script src="/version_2.0/ace_admin/assets/js/ace.min.js"></script>
+    <meta name='robots' content='NONE,NOARCHIVE' />
+</head>
+
+
+<body class="login-layout" style="background-color: #ffffff;">
+<div class="main-container">
+    <div class="main-content">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <div class="login-container">
+                    <div class="center">
+                        <h1>
+                            <span class="black">Mebel CRM</span>
+                        </h1>
+                        <h4 class="blue" id="id-company-text">&copy; Mebel</h4>
+                    </div>
+
+                    <div class="space-6"></div>
+
+                    <div class="position-relative">
+                        <div id="login-box" class="login-box visible widget-box no-border" style="background-color: #5f9ea0;">
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <h4 class="header blue lighter bigger">
+                                        <i class="fa fa-sign-in green"></i>
+                                        Вход в систему
+                                    </h4>
+                                    <?
+                                    if (strlen($this->error) > 0) {?>
+                                        <span class="text-warning bigger-110 orange">
+                                            <i class="ace-icon fa fa-exclamation-triangle"></i>
+                                            <?=$this->error?>
+                                        </span>
+                                        <?
+                                    }?>
+                                    <div class="space-6"></div>
+                                    <form method="post">
+                                        <fieldset>
+                                            <label class="block clearfix">
+														<span class="block input-icon input-icon-right">
+															<input type="text" class="form-control" placeholder="Пользователь" name="login" value="<?=$this->login?>"/>
+															<i class="ace-icon fa fa-user"></i>
+														</span>
+                                            </label>
+
+                                            <label class="block clearfix">
+														<span class="block input-icon input-icon-right">
+															<input type="password" class="form-control" placeholder="Пароль" name="password" />
+															<i class="ace-icon fa fa-lock"></i>
+														</span>
+                                            </label>
+
+                                            <div class="space"></div>
+
+                                            <div class="clearfix">
+                                                <button type="submit" class="width-35 pull-right btn btn-sm btn-primary">
+                                                    <i class="ace-icon fa fa-key"></i>
+                                                    <span class="bigger-110">Вход</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="space-4"></div>
+                                        </fieldset>
+                                    </form>
+                                </div><!-- /.widget-main -->
+                            </div><!-- /.widget-body -->
+                        </div><!-- /.login-box -->
+                    </div><!-- /.position-relative -->
+                </div>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.main-content -->
+</div><!-- /.main-container -->
+</body>

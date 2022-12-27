@@ -1,0 +1,107 @@
+<?
+$controller_name = $this->controller_name;
+$action_name = $this->action_name;
+
+$menu_global_id = $this->menu_global_id;
+create_menu(0, $menu_global_id);
+?>
+
+<?
+function create_menu($menu_pid, $menu_global_id){
+    $ob = new Application_Model_DbTable_System();
+    $row = $ob->menu_read_recursive($menu_pid, $menu_global_id);
+    $row = $row['value'];
+    foreach($row as $value){
+        //Есди есть дочерние элементы
+        if ($value['cnt'] > 0){?>
+            <li class="<?if($value['is_open'] == 1) { echo ' active open ';}?>">
+                <a href="#" class="dropdown-toggle">
+                    <i class="menu-icon fa <?=$value['icon']?>"></i>
+                    <span class="menu-text"> <?=$value['menu_name']?> </span>
+                    <?
+                    if($value['circle_cnt'] > 0){?>
+                        <span class="badge badge-primary"><?=$value['circle_cnt']?></span>
+                        <?
+                    }?>
+                    <b class="arrow fa fa-angle-down"></b>
+                </a>
+                <b class="arrow"></b>
+                <ul class="submenu">
+                    <?
+                    create_menu($value['menu_id'], $menu_global_id);
+                    ?>
+                </ul>
+            </li>
+            <?
+        }
+        //Если верхний уровень меню, но без дочерних элементов
+        if ($value['cnt'] == 0 && $menu_pid == 0){?>
+            <li class="<?if($value['is_open'] == 1) { echo ' active ';}?>">
+                <a href="<?=$value['menu_action']?>menu_global_id/<?=$value['menu_id']?>">
+                    <i class="menu-icon fa <?=$value['icon']?>"></i>
+                    <span class="menu-text"> <?=$value['menu_name']?> </span>
+                </a>
+                <b class="arrow"></b>
+            </li>
+            <?
+        }
+        //Если дочерний элемент
+        if ($value['cnt'] == 0 && $menu_pid > 0){?>
+            <li class="<?if($value['is_open'] == 1) { echo ' active ';}?>">
+                <a href="<?=$value['menu_action']?>menu_global_id/<?=$value['menu_id']?>">
+                    <i class="menu-icon fa <?=$value['icon']?>"></i>
+                    <?=$value['menu_name']?>
+                    <?
+                    if($value['circle_cnt'] > 0){?>
+                        <span class="badge badge-primary"><?=$value['circle_cnt']?></span>
+                        <?
+                    }?>
+                </a>
+                <b class="arrow"></b>
+            </li>
+            <?
+        }
+
+    }
+}
+?>
+
+<!--<li class="">-->
+<!--    <a href="#" class="dropdown-toggle">-->
+<!--        <i class="menu-icon fa fa-list"></i>-->
+<!--        <span class="menu-text"> Tables </span>-->
+<!---->
+<!--        <b class="arrow fa fa-angle-down"></b>-->
+<!--    </a>-->
+<!---->
+<!--    <b class="arrow"></b>-->
+<!---->
+<!--    <ul class="submenu">-->
+<!--        <li class="">-->
+<!--            <a href="tables.html">-->
+<!--                <i class="menu-icon fa fa-caret-right"></i>-->
+<!--                Simple &amp; Dynamic-->
+<!--            </a>-->
+<!---->
+<!--            <b class="arrow"></b>-->
+<!--        </li>-->
+<!---->
+<!--        <li class="">-->
+<!--            <a href="jqgrid.html">-->
+<!--                <i class="menu-icon fa fa-caret-right"></i>-->
+<!--                jqGrid plugin-->
+<!--            </a>-->
+<!---->
+<!--            <b class="arrow"></b>-->
+<!--        </li>-->
+<!--    </ul>-->
+<!--</li>-->
+<!---->
+<!--<li class="">-->
+<!--    <a href="index.html">-->
+<!--        <i class="menu-icon fa fa-tachometer"></i>-->
+<!--        <span class="menu-text"> Dashboard </span>-->
+<!--    </a>-->
+<!---->
+<!--    <b class="arrow"></b>-->
+<!--</li>-->

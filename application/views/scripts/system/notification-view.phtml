@@ -1,0 +1,34 @@
+<div id="id-message-item-navbar" class="message-navbar clearfix">
+    <div class="message-bar">
+        <div class="messagebar-item-left">
+            <a href="/system/notification-list" class="btn-back-message-list">
+                <i class="ace-icon fa fa-arrow-left blue bigger-110 middle"></i>
+                <b class="bigger-110 middle">Назад к списку</b>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="message-content" id="id-message-content">
+    <div class="message-header clearfix">
+        <div class="pull-left">
+            <b><?=$this->row['email_title']?></b>,
+            <i class="ace-icon fa fa-clock-o bigger-110 orange middle"></i>
+            <span class="time grey"><?=$this->row['date_send']?></span>
+        </div>
+    </div>
+    <div class="hr hr-double"></div>
+    <div class="message-body">
+        <?=$this->row['email_content']?>
+    </div>
+    <div class="hr hr-double"></div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+       $('table').addClass('table-local');
+        <?
+        if($this->row['is_reviewed'] == 0){?>
+            set_send_email_user_reviewed(<?=$this->send_email_user_id?>);
+            <?
+        }?>
+    });
+</script>

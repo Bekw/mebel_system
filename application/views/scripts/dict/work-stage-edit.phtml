@@ -1,0 +1,75 @@
+<?
+if (isset($this->row['error'])) {?>
+    <div class="alert alert-danger">
+        <?=$this->row['error']?>
+    </div>
+    <?
+}?>
+<div class="modal-body">
+    <form id="stage_form">
+        <input type="hidden" name="work_id" value="<?=$this->work_id?>">
+        <div class="form-group">
+            <label class="control-label " for="document_type_id">Тип работы</label>
+            <div class="form-control no-padding">
+                <select class="form-control" id="stage_id" name="stage_id" required>
+                    <option value="0">Выберите тип работы</option>
+                    <?
+                    if(mycount($this->row_stage) > 0){
+                        foreach ($this->row_stage as $key => $value){?>
+                            <option value="<?=$value['stage_id']?>"><?=$value['name']?></option>
+                            <?
+                        }
+                    }?>
+                </select>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label " for="auditor_comment">Комментарии</label>
+            <textarea class="form-control" name="comment" style="height: 100px; overflow: hidden; overflow-wrap: break-word; resize: horizontal;" id="comments" placeholder="Комментарии"></textarea>
+            <div class="clearfix"></div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" onclick="work_stage_upd()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $(".date-picker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+5"
+        });
+    });
+
+    function work_stage_upd(){
+        var fd = new FormData($("#stage_form")[0]);
+        $.ajax({
+            type: 'POST',
+            url: "/dict/index-json/mode/upd_stage/",
+            data: fd,
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка ', '', 3);
+                } else{
+                    $(".modal").modal('hide');
+                    Notify.generate('Успех', '', 1);
+                    location.reload();
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+</script>

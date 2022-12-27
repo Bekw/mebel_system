@@ -1,0 +1,47 @@
+<div class="modal-body">
+    <?
+    if (isset($this->row['error'])) {?>
+        <div class="alert alert-danger">
+            <?=$this->row['error']?>
+        </div>
+        <?
+    }?>
+    <div class="clearfix"></div>
+    <div class="">
+        <form id="form_type">
+            <div class="form-group">
+                <textarea id="comment" name="comment" style="height: 200px;" class="autosize-transition form-control"></textarea>
+            </div>
+            <div class="clearfix"></div>
+        </form>
+    </div>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" id="btn_photo" onclick="saveEmployeeNeeds()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+<script>
+    function saveEmployeeNeeds(){
+        var send_data = $('#form_type').serializeArray();
+        $.ajax({
+            type: 'POST',
+            url: "/dict/employee-needs/mode/upd/",
+            data:  send_data,
+            success: function(data){
+                if(data.result['status']){
+                    $('.modal').modal('hide');
+                    location.reload();
+                }else{
+                    alert(data.result['error'])
+                }
+            }
+        });
+    }
+</script>
+

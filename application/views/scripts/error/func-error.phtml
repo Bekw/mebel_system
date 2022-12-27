@@ -1,0 +1,16 @@
+<div id="error_func_block_global">
+    <?
+    $session = new Zend_Session_Namespace('Global');
+    foreach ($session->error_func_msg as $value){?>
+        <div class="alert alert-danger">
+            <?=$value?> <?=date("d.m.Y H:m:s")?>
+        </div>
+        <?
+    }
+    ?>
+</div>
+
+<script>
+    $("#main_page_content").empty();
+    $("#main_page_content").append($("#error_func_block_global").detach());
+</script>

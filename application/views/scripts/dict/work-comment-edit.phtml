@@ -1,0 +1,183 @@
+<link rel="stylesheet" href="/design/css/style.css?v=22">
+<?
+if (isset($this->row['error'])) {?>
+    <div class="alert alert-danger">
+        <?=$this->row['error']?>
+    </div>
+    <?
+}?>
+<div class="modal-body" id="modal_body">
+    <form id="comment_form">
+        <input type="hidden" name="work_id" value="<?=$this->work_id?>">
+        <div class="form-group">
+            <label class="control-label " for="auditor_comment">Комментарии</label>
+            <textarea class="form-control" name="comment" style="height: 100px; overflow: hidden; overflow-wrap: break-word; resize: horizontal;" id="comments" placeholder="Комментарии"></textarea>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="write-message-block">
+            <div class="prev_p_contr style-11-contr"></div>
+
+            <label class="custom-file-upload-contr">
+                <span class="btn btn-primary inp-btn-down" style="margin-right: 10px;">
+                    <i class="ace-icon fa fa-folder-open bigger-110"></i>
+                    ЗАГРУЗИТЬ
+                </span>
+                <input type="file" id="resident_files" multiple/>
+            </label>
+
+            <span class="btn btn-primary inp-btn-del"  onclick="resetImg(this)">
+                <i class="ace-icon fa fa-remove bigger-110"></i>
+                    ОЧИСТИТЬ
+            </span>
+        </div>
+    </form>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" onclick="comment_upd()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+
+<script>
+    var newFileList;
+    $(document).ready(function() {
+        $(".chosen-select").chosen({
+            no_results_text: "Ничего не найдено...",
+            search_contains: true
+        });
+        $(".date-picker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+0"
+        });
+        $('#resident_files').change(function (e) {
+            $('.prev_p_contr').empty();
+            //newFileList = [];
+            if($(newFileList).length == 0){
+                newFileList = Array.from(event.target.files);
+            }else{
+                $(event.target.files).each(function (i, item) {
+                    newFileList.push(item);
+                });
+            }
+            $(newFileList).each(function (i, item) {
+                renderImage(i, item);
+            });
+            console.log(newFileList);
+        });
+        $(".group1").colorbox({
+            rel:'group1',
+            photo:true,
+            previous:'<i class="ace-icon fa fa-arrow-left"></i>',
+            next:'<i class="ace-icon fa fa-arrow-right"></i>',
+            close:'&times;',
+            scalePhotos: true,
+            scrolling:false,
+            maxWidth: '100%',
+            maxHeight:'100%',
+            width: '50%',
+            weight:'50%',
+            reposition:true,
+            onOpen:function(){
+                $overflow = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+            },
+            onClosed:function(){
+                document.body.style.overflow = $overflow;
+            },
+            onComplete:function(){
+                $.colorbox.resize();
+            }
+        });
+        $("#cboxLoadingGraphic").html("<i class='ace-icon fa fa-spinner orange fa-spin'></i>");//let's add a custom loading icon
+    });
+    function resetImg(ob) {
+        newFileList = [];
+        $('.prev_p_contr').empty();
+    }
+    function bytesToSize(bytes) {
+        var sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes == 0) return '0 Byte';
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+    }
+
+    // рендеринг изображения
+    function renderImage(i, item) {
+        var ext = item.name.substring(item.name.lastIndexOf('.') + 1).toLowerCase();
+        var type;
+        // генерируем новый объект FileReader
+        var reader = new FileReader();
+        // дабавляет атрибут src в изображение
+        reader.onload = function(event) {
+            the_url = event.target.result
+            if(ext == 'pdf'){
+                type = '<a href="javascript:void(0);"><i class="fa fa-file-pdf-o"></i></a>';
+            }else if(ext == 'png' || ext == 'jpeg' || ext == 'jpg' || ext == 'gif' || ext == 'bmp'){
+                type = '<a href="javascript:void(0);"><img id="img_'+ i +'" src="'+ the_url +'"></a>';
+            }else if(ext == 'xlsx' || ext == 'xls'){
+                type = '<a href="javascript:void(0);"><i class="fa fa-file-excel-o"></i></a>';
+            }else if(ext == 'docx' || ext == 'doc'){
+                type = '<a href="javascript:void(0);"><i class="fa fa-file-word-o"></i></a>';
+            }else if(ext == 'mp4' || ext == 'avi' || ext == 'wmv' || ext == '3gp' || ext == 'flv'){
+                type = '<a href="javascript:void(0);"><i class="fa fa-file-video-o"></i></a>';
+            }else{
+                type = '<a href="javascript:void(0);"><i class="fa fa-file-o"></i></a>';
+            }
+            $('.prev_p_contr').append('<div class="message-files-block-contr pull-left" id="'+i+'"><div class="miniature-contr pull-left">'+ type +'</div><div class="file-text-block pull-left"><p class="file-name-contr regular" title="'+item.name +'">'+ item.name +'</p><p class="file-download regular">'+ bytesToSize(item.size) +' <a href="javascript:void(0);" onclick="del('+i +', this)"><i class="fa fa-times red"></i></a></p></div><div class="clearfix"></div></div>');
+        }
+        // когда файл считывается он запускает событие OnLoad.
+        reader.readAsDataURL(item);
+    }
+
+    function comment_upd(){
+        var fd = new FormData($("#comment_form")[0]);
+        if($(newFileList).length > 0){
+            $(newFileList).each(function (i, item) {
+                fd.append('work_files[]', item);
+            });
+        }else{
+            fd.append('work_files[]', '');
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-comment-edit/mode/upd/",
+            data: fd,
+            async: true,
+            success: function(data){
+                if(data.result['status'] == true){
+                    Notify.generate('Успех', '', 1);
+                    // items_ajax_call(1, this);
+                    $(".modal").modal('hide');
+                    newFileList = [];
+                    $('.prev_p_contr').empty();
+                    $('#comment_list').load('/dict/work-comment-list/work_id/<?=$this->work_id?>');
+                }else{
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка', '', 3);
+
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+
+    function del(index, ob) {
+        newFileList.splice(index,1);
+        $('.prev_p_contr').empty();
+        $(newFileList).each(function (i, item) {
+            renderImage(i, item);
+        });
+        $(ob).closest('.message-files-block-contr').remove();
+        console.log(newFileList.length);
+    }
+
+</script>

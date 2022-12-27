@@ -1,0 +1,107 @@
+<div class="page-header">
+    <h1 class="pull-left">Заявки поставщику:</h1>
+    <div class="clearfix"></div>
+</div>
+<div id="provider_requests" >
+    <hr>
+    <?
+    if(mycount($this->row_provider_request) > 0){
+        foreach ($this->row_provider_request as $key => $value){
+            $ob = new Application_Model_DbTable_Dict();
+            $row_item = $ob->read_provider_request_item($value['provider_request_id'])['value'];
+            ?>
+            <div style="margin-bottom: 15px;">
+                <table class="table table-striped table-bordered hover-table no-margin-bottom no-border-top">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th >Материал</th>
+                        <th>Кол-во</th>
+                        <th>Цена</th>
+                        <th>Общее</th>
+                        <th>Статус</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr style="background-color: #a1dbec">
+                        <th colspan="6">
+
+                            <div style="float:left; margin-right: 40px;">
+                                <p>Поставщик: <?=$value['provider_name']?></p>
+                                <p>Кто добавил: <?=$value['fio']?></p>
+                                <p>Дата отгрузки: <?=$value['delivery_date']?></p>
+                                <a href="/dict/work-detail/work_id/<?=$value['work_id']?>" class="btn btn-primary btn-xs" target="_blank">
+                                    Работа
+                                </a>
+                            </div>
+                            <div style="float:left; margin-right: 40px;">
+                                <p>Адрес: <?=$value['address']?></p>
+                                <p>Дата создания: <?=$value['request_date']?></p>
+                            </div>
+                        </th>
+                    </tr>
+                    <?
+                    if(mycount($row_item) > 0){
+                        $i = 1;
+                        $total_price = 0;
+                        ?>
+                        <?
+                        foreach ($row_item as $key => $doc){
+                            $total_price = $total_price + $doc['total'];
+                            ?>
+                            <tr>
+                                <td class="text-right" ><?=$i?></td>
+                                <td class="text-left" ><?=$doc['material_name']?></td>
+                                <td class="text-right"><?=tenge_text($doc['cnt'])?></td>
+                                <td class="text-right"><?=tenge_text($doc['price'])?></td>
+                                <td class="text-right"><?=tenge_text($doc['total'])?></td>
+                                <td class="text-center">
+                                    <select onchange="saveStatus(<?=$doc['provider_request_item_id']?>, this)" class="chosen-select form-control" id="malyar_employee_id" data-placeholder="Выберите маляра..." name="malyar_employee_id">
+                                        <option value="1" <?if($doc['status_id'] == 1){?>selected<?}?>>Создан</option>
+                                        <option value="2" <?if($doc['status_id'] == 2){?>selected<?}?>>В наличии</option>
+                                        <option value="3" <?if($doc['status_id'] == 3){?>selected<?}?>>Нет в наличии</option>
+                                        <option value="4" <?if($doc['status_id'] == 4){?>selected<?}?>>Отгружен</option>
+
+                                    </select>
+                                </td>
+                            </tr>
+                            <?
+                            $i = $i + 1;
+                        }
+                    }
+                    ?>
+                    <tr>
+                        <td class="text-center" colspan="4"></td>
+                        <td class="text-right"><span style="font-weight: bold"><?=tenge_text($total_price)?></span></td>
+                        <td class="text-center"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="clearfix"></div>
+            <?
+        }
+    }
+    ?>
+
+</div>
+<script>
+
+    function saveStatus(provider_request_item_id, ob){
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-detail/mode/upd-status-provider/",
+            data: {provider_request_item_id : provider_request_item_id, status_id : ob.value},
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при изменении', '', 3);
+                } else{
+                    $(".modal").modal('hide');
+                    Notify.generate('Успешно', '', 1);
+                }
+            }
+        });
+    }
+</script>

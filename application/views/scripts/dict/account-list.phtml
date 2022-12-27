@@ -1,0 +1,101 @@
+<div class="page-header">
+    <h1 class="pull-left">Счеты</h1>
+    <div class="btns-block pull-right">
+        <a href="javascript:void(0)" onclick="showEditForm(0)" class="btn btn-xs btn-primary">Создать</a>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+<div class="hr hr-10 dotted hr-double"></div>
+<div class="table-responsive" id="account_load">
+    <table class="table-local table-striped table-bordered hover-table no-margin-bottom no-border-top" id="account_tab">
+        <thead>
+        <tr>
+            <th style="width: 10px;">ID</th>
+            <th>Наименование</th>
+            <th>Код</th>
+            <th>Тип</th>
+            <th>Начало в месяцах</th>
+            <th>Конец в месяцах</th>
+            <th>Счет</th>
+            <th>Ручное создание</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?
+        foreach ( (array) $this->row as $key => $value){?>
+            <tr>
+                <td class="text-right"><?=$value['account_id']?></td>
+                <td class="text-left">
+                    <a href="javascript:void(0)" onclick="showEditForm(<?=$value['account_id']?>)"><?=$value['account_name']?></a>
+                </td>
+                <td class="text-left"><?=$value['account_code']?></td>
+                <td class="text-left"><?=$value['account_type_name']?></td>
+                <td class="text-right"><?=$value['term_begin']?></td>
+                <td class="text-right"><?=$value['term_end']?></td>
+                <td class="text-right"><?=$value['account_num']?></td>
+                <td class="text-center">
+                    <?if($value['is_manual'] == true){?>
+                        <i class="fa fa-check green bigger-150" aria-hidden="true"></i>
+                    <?}else{?>
+                        <i class="fa fa-times red bigger-150" aria-hidden="true"></i>
+                    <?}?>
+                </td>
+                <td class="del-td">
+                    <div class="action-buttons">
+                        <a class="red" href="javascript:void(0);" onclick="delAccount(<?=$value['account_id']?>, '<?=$value['account_name']?>', this)">
+                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            <?
+        }
+        ?>
+        </tbody>
+    </table>
+</div>
+<?=$this->partial('dict/modal-container.phtml');?>
+
+<script>
+    function showEditForm(account_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Добавление/Редактирование счёта');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/account-edit/",
+            data: {
+                account_id : account_id
+            },
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+    function delAccount(account_id, account_name, ob){
+        if (!confirm("Вы действительно хотите удалить " +account_name + " ?")) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/account-list/mode/del/account_id/" + account_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    Notify.generate(account_name + ' удален', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+
+</script>

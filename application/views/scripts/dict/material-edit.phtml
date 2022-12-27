@@ -1,0 +1,70 @@
+<div class="modal-body">
+    <?
+    if (isset($this->row['error'])) {?>
+        <div class="alert alert-danger">
+            <?=$this->row['error']?>
+        </div>
+        <?
+    }?>
+    <div class="clearfix"></div>
+    <div class="">
+        <form id="form_type">
+            <input type="hidden" value="<?=$this->material_id?>" name="material_id">
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label class="control-label " for="material_name">Название</label>
+                    <input type="text" id="material_name" placeholder="Название" class="form-control" value="<?=$this->row['material_name']?>" name="material_name">
+                    <div class="clearfix"></div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label class="control-label " for="material_type_id">Тип материала</label>
+                    <select class="form-control" id="material_type_id" name="material_type_id" required>
+                        <option value="0">Выберите тип материала</option>
+                        <?
+                        if(mycount($this->row_type) > 0){
+                            foreach ($this->row_type as $key => $value){?>
+                                <option value="<?=$value['material_type_id']?>" <?if($this->row['material_type_id'] == $value['material_type_id']){?>selected<?}?>><?=$value['material_type_name']?></option>
+                                <?
+                            }
+                        }?>
+                    </select>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="clearfix"></div>
+        </form>
+    </div>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" id="btn_photo" onclick="saveMaterialType()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+<script>
+    function saveMaterialType(){
+        var send_data = $('#form_type').serializeArray();
+        $.ajax({
+            type: 'POST',
+            url: "/dict/material-list/mode/upd/",
+            data:  send_data,
+            success: function(data){
+                if(data.result['status']){
+                    $('.modal').modal('hide');
+                    location.reload();
+                }else{
+                    alert(data.result['error'])
+                }
+            }
+        });
+    }
+</script>
+

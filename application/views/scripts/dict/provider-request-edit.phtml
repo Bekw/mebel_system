@@ -1,0 +1,93 @@
+<div class="page-header">
+    <h1 class="pull-left">Редактирование товара:</h1>
+    <a href="/dict/work-detail/work_id/<?=$this->work_id?>" class="btn btn-primary">
+        Назад
+    </a>
+    <div class="clearfix"></div>
+</div>
+<?
+if (isset($this->a['error'])) {?>
+    <div class="alert alert-danger">
+        <?=$this->a['error']?>
+    </div>
+    <?
+}?>
+<form method="post">
+    <div class="col-lg-5">
+        <input type="hidden" name="work_id" value="<?if(isset($this->row['work_id'])){echo $this->row['work_id'];} else{ echo 0; }?>">
+        <div class="form-group">
+            <label class="control-label" for="form-field-1">Поставщик </label>
+            <input type="text" name="provider_name" class="form-control"  required>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="form-field-1">Адрес </label>
+            <input type="text" name="address" class="form-control"  required>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label no-padding-right" for="measure_time">Дата отгрузки</label>
+            <input type="text" style="width: 166px; height: 34px" id="delivery_date" name="delivery_date" placeholder="Дата отгрузки" class="form-control date-picker" autocomplete="off">
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <hr>
+    <div onclick="addNewCharacteristicByProduct()" style="cursor: pointer;">
+        <i class="fa fa-plus-circle green" style="float: left; margin: 7px 0px 0px 5px;"></i>
+        <p style="float: left; margin-top: 4px; margin-left: 10px">Добавить материал</p>
+    </div>
+    <div class="clearfix"></div>
+    <input type="hidden" id="counter" value="1">
+    <span id="product_values_form"></span>
+    <div class="clearfix"></div>
+    <button type="submit" class="btn btn-success pull-left"  name="save_common">Сохранить</button>
+</form>
+<div class="product-characteristic-item-clone" style="display: none;">
+    <div class="form-group">
+        <div class="col-sm-3 col-lg-3 col-md-3 col-xs-3 control-label no-padding-right" style="margin-right: 10px;">
+            <select name="material_id[]" class="material-id-new form-control" style="margin-bottom: 0px;" required>
+                <option value="0">Выберите материал</option>
+                <?  if(count($this->row_material) > 0){
+                    foreach($this->row_material as $key => $value){ ?>
+                        <option value="<?=$value['material_id']?>"><?=$value['material_name']?></option>
+                        <?
+                    }
+                }
+                ?>
+            </select>
+        </div>
+        <div class="col-sm-2 col-lg-2 col-md-2 col-xs-2 control-label no-padding-right" style="margin-right: 10px;">
+            <input type="number" step="any" name="cnt[]" class="material-cnt-new form-control" placeholder="Кол-во">
+        </div>
+        <div class="col-sm-2 col-lg-2 col-md-2 col-xs-2 control-label no-padding-right" style="margin-right: 10px;">
+            <input type="number" step="any" name="price[]" class="material-price-new form-control" placeholder="Цена">
+        </div>
+        <div class="col-lg-2" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; margin-bottom: 5px;">
+            <div class="value col-sm-12 col-lg-12 col-md-12 col-xs-12" style="display: none">
+            </div>
+            <i class="fa fa-remove red" style="float: left; cursor: pointer;" onclick="deleteProductCharacteristic(this,0)"></i>
+
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</div>
+<script>
+
+    function deleteProductCharacteristic(ob,product_characteristic_id){
+        $(ob).closest(".product-characteristic-item").remove();
+    }
+
+    function addNewCharacteristicByProduct(){
+        counter = $("#counter").val();
+        a = $(".product-characteristic-item-clone").clone();
+        a.removeClass("product-characteristic-item-clone");
+        a.addClass("product-characteristic-item");
+        a.find(".material-id-new").attr("name","material_id[" + counter +"]");
+        a.find(".product-cnt-new").attr("name","cnt[" + counter +"]");
+        a.find(".product-price-new").attr("name","price[" + counter +"]");
+        a.css("display","block");
+        $("#product_values_form").append(a);
+        counter++;
+        $("#counter").val(counter);
+    }
+</script>

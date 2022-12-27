@@ -1,0 +1,54 @@
+<?
+if (isset($this->row['error'])) {?>
+    <div class="alert alert-danger">
+        <?=$this->row['error']?>
+    </div>
+    <?
+}?>
+<div class="modal-body">
+    <form id="request_work">
+        <input type="hidden" name="request_id" value="<?=$this->request_id?>">
+        <div class="form-group">
+            <label class="control-label " for="document_type_id">Тип работы</label>
+            <div class="form-control no-padding">
+                <select class="form-control" id="work_type_id" name="work_type_id" required>
+                    <option value="0">Выберите тип работы</option>
+                    <?
+                    if(mycount($this->work_type) > 0){
+                        foreach ($this->work_type as $key => $value){?>
+                            <option value="<?=$value['work_type_id']?>"><?=$value['name']?></option>
+                            <?
+                        }
+                    }?>
+                </select>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="work_name">Название</label>
+            <input type="text" class="form-control" name="work_name" id="work_name" required>
+            <div class="clearfix"></div>
+        </div>
+
+    </form>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" onclick="work_request_upd()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $(".date-picker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+5"
+        });
+    });
+</script>

@@ -1,0 +1,92 @@
+<form id="form_modal_acount">
+    <div class="modal-body">
+        <input type="hidden" value="<?=$this->account_id?>" name="account_id">
+
+        <div class="form-group">
+            <label class="control-label" for="account_name">Наименование</label>
+            <input type="text" class="form-control" name="account_name" id="account_name" value="<?=$this->row['account_name']?>" required>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="account_code">Код</label>
+            <input type="text" class="form-control" name="account_code" id="account_code" value="<?=$this->row['account_code']?>" required>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="account_type_id">Тип</label>
+            <select name="account_type_id" id="account_type_id" class="form-control" required>
+                <option value="0">Выберите из списка</option>
+                <?
+                foreach ($this->row_type as $value){?>
+                    <option value="<?=$value['account_type_id']?>" <?=is_selected_html($this->row['account_type_id'], $value['account_type_id'])?>><?=$value['account_type_name']?></option>
+                    <?
+                }?>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="term_begin">Начало в месяцах</label>
+            <input type="text" class="form-control" name="term_begin" id="term_begin" value="<?=$this->row['term_begin']?>" required>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="term_end">Конец в месяцах</label>
+            <input type="text" class="form-control" name="term_end" id="term_end" value="<?=$this->row['term_end']?>" required>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="account_num">Счет</label>
+            <input type="text" class="form-control" name="account_num" id="account_num" value="<?=$this->row['account_num']?>" required>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="checkbox">
+            <label class="block" style="width: fit-content; width: -moz-fit-content;">
+                <input name="is_manual" type="checkbox" class="ace input-lg" <?=is_checked_html(coalesce($this->row['is_manual'], 1))?>>
+                <span class="lbl bigger-120"> Ручное создание</span>
+                <div class="clearfix"></div>
+            </label>
+        </div>
+    </div>
+    <div class="modal-footer no-margin-top">
+        <button type="button" onclick="updAccount()" class="btn btn-sm btn-success">
+            <i class="ace-icon fa fa-check"></i>Сохранить
+        </button>
+        <button class="btn btn-sm btn-danger" data-dismiss="modal">
+            <i class="ace-icon fa fa-times"></i>Закрыть
+        </button>
+    </div>
+</form>
+
+<script>
+    function updAccount(){
+        var fd = new FormData($("#form_modal_acount")[0]);
+        sr_loader_show();
+        $.ajax({
+            type: 'POST',
+            data: fd,
+            async: true,
+            url: "/dict/account-list/mode/upd/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка', '', 3);
+                }
+                else{
+                    $('#account_load').load('/dict/account-list #account_tab');
+                    $("#modal-container").modal('hide');
+                    Notify.generate('Успешно', '', 1);
+                }
+                sr_loader_hide();
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+</script>
+

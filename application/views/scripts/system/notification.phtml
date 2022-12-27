@@ -1,0 +1,41 @@
+<li class="dropdown-header">
+    <i class="ace-icon fa fa-envelope-o"></i>
+    <?=count($this->row)?> сообщений
+</li>
+
+<li class="dropdown-content ace-scroll" style="position: relative;"><div class="scroll-track" style="display: none; height: 200px;"><div class="scroll-bar" style="height: 111px; top: 0px;"></div></div><div class="scroll-content" style="">
+        <ul class="dropdown-menu dropdown-navbar notification-drop-menu">
+            <?
+            foreach ($this->row as $value){?>
+                <li>
+                    <div class="clearfix noty" href="#">
+                        <i class="msg-photo btn btn-minier btn-pink fa fa-eye" style="border-radius: 26px;" onclick="set_send_email_user_reviewed(<?=$value['send_email_user_id']?>)"></i>
+                        <span class="msg-body" style="margin-left: 35px;">
+                            <a class="msg-title" href="/system/notification-view/send_email_user_id/<?=$value['send_email_user_id']?>" target="_blank"><?=$value['email_title']?></a>
+                            <span class="msg-time">
+                                <i class="ace-icon fa fa-clock-o"></i>
+                                <span><?=$value['date_send']?></span>
+                            </span>
+                        </span>
+                    </div>
+                </li>
+                <?
+            }?>
+        </ul>
+    </div>
+</li>
+
+<li class="dropdown-footer">
+    <a href="/system/notification-list">
+        Просмотреть все уведомления
+        <i class="ace-icon fa fa-arrow-right"></i>
+    </a>
+</li>
+
+<script>
+    $(document).ready(function(){
+        $('.notification-drop-menu').click(function(e) {
+            e.stopPropagation();
+        });
+    })
+</script>

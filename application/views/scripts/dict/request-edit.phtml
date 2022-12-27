@@ -1,0 +1,510 @@
+<?
+if (strlen($this->globalError) > 0) {?>
+    <div class="alert alert-danger">
+        <?=$this->globalError?>
+    </div>
+    <?
+}?>
+<div class="alert alert-info">
+    <div style="float:left; margin-right: 40px;">
+        <p>ФИО: <?=$this->row_client['client_fio']?></p>
+        <p>Адрес: <?=$this->row_client['address']?></p>
+        <p>Телефон клиента: <?=$this->row_client['client_phone']?></p>
+    </div>
+    <div style="float:left; margin-right: 40px;">
+        <p>Площадь: <?=$this->row_client['house_area']?></p>
+        <p>Дата замера: <?=$this->row_client['measure_time']?></p>
+        <div class="checkbox">
+            <label style="padding-left: 10px;" title="70% процентов оплачено">
+                <input id="is_paid" type="checkbox" class="ace" <?if($this->row_client['is_paid'] == 1){echo ' checked';}?> <?if($this->row_client['is_paid'] == 1 && getCurPositionCode() != 'ADMIN'){?> disabled <?}?>>
+                <span class="lbl orange"> Оплачено</span>
+            </label>
+        </div>
+        <div class="checkbox">
+            <label style="padding-left: 10px;" title="Клиент утвердил проект">
+                <input id="is_accepted" type="checkbox" class="ace" <?if($this->row_client['is_accepted'] == 1){echo ' checked';}?> <?if($this->row_client['is_accepted'] == 1 && getCurPositionCode() != 'ADMIN'){?> disabled <?}?>>
+                <span class="lbl orange"> Клиент утвердил проект</span>
+            </label>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+<div class="tabs hidden main-tabs">
+    <ul class="nav nav-tabs" id="tabs">
+        <li><a data-toggle="tab" data-target="#common">Общее</a></li>
+        <li><a data-toggle="tab" data-target="#works">Работы</a></li>
+        <li><a data-toggle="tab" data-target="#docs">Документы</a></li>
+        <li><a data-toggle="tab" data-target="#payments" <?if(getCurPositionCode() != 'ADMIN'){?>style="display: none" <?}?>>Платежи</a></li>
+    </ul>
+</div>
+<div class="tab-content">
+    <div id="common" class="tab-pane fade">
+        <div class="col-lg-3 col-md-4 col-sm-5">
+            <form method="post">
+                <?if(getCurPositionCode() == 'ADMIN' || getCurPositionCode() == 'Manager'){?>
+                    <div class="form-group pull-left margin-right-10">
+                        <label class="control-label no-padding-right" for="measure_time">Дата замера</label>
+                        <input type="text" style="width: 166px; height: 34px" id="measure_time" name="measure_time" placeholder="Дата замера" class="form-control date-picker" value="<?=$this->row_client['measure_time']?>" autocomplete="off">
+                    </div>
+                <?}?>
+                <div class="clearfix"></div>
+                <div class="form-group pull-left margin-right-10">
+                    <label class="control-label no-padding-right">Цена работы</label>
+                    <input type="text" name="total_price" placeholder="Цена работы" class="form-control" value="<?=$this->row_client['total_price']?>" autocomplete="off">
+                </div>
+                <div class="clearfix"></div>
+                <div class="form-group">
+                    <label for="info">Комментарий от клиента</label>
+                    <textarea id="client_comment" name="client_comment" style="height: 200px;" class="autosize-transition form-control"><?=$this->row_client['client_comment']?></textarea>
+                </div>
+                <div class="clearfix"></div>
+                <?if(in_array(getCurPositionCode(), array('ADMIN', 'Brigadir', 'Manager'))){?>
+                    <button type="submit"  class="btn btn-success pull-right"  name="save_common">Сохранить</button>
+                <?}?>
+            </form>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div id="works" class="tab-pane fade">
+        <a href="javascript:void(0)" onclick="showWorkForm(<?=$this->request_id?>)" class="btn btn-info btn-xs pull-right">Добавить работу</a>
+        <div class="clearfix"></div>
+        <hr>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered hover-table no-margin-bottom no-border-top">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Тип</th>
+                    <th>Этап</th>
+                    <th>Работник</th>
+                    <th>Дата создания</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?
+                if(mycount($this->request_work) > 0){
+                    $i = 1;
+                    foreach ($this->request_work as $key => $work){
+                        ?>
+                        <tr>
+                            <td class="text-right"><?=$i?></td>
+                            <td class="text-left"><a href="/dict/work-detail/work_id/<?=$work['work_id']?>"><?=$work['work_name']?></a></td>
+                            <td class="text-left"><?=$work['work_type_name']?></td>
+                            <td class="text-left"><?=$work['stage_name']?></td>
+                            <td class="text-left"><?=$work['fio']?></td>
+                            <td class="text-center"><?=$work['work_date']?></td>
+                            <td class="text-left">
+                                <div class="action-buttons">
+                                    <a class="red" <?if(getCurEmployee() != $work['employee_id']){?> style="display: none;" <?}?> href="javascript:void(0);" onclick="delWork(<?=$work['work_id']?>, this)">
+                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?
+                        $i = $i + 1;
+                    }
+                }
+                ?>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <div id="docs" class="tab-pane fade">
+        <a href="javascript:void(0)" onclick="showDocForm(<?=$this->request_id?>)" class="btn btn-info btn-xs pull-right">Добавить документ</a>
+        <div class="clearfix"></div>
+        <hr>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered hover-table no-margin-bottom no-border-top">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Тип</th>
+                    <th>Название</th>
+                    <th>Работник</th>
+                    <th>Дата создания</th>
+                    <th>Скачать</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?
+                if(mycount($this->request_doc) > 0){
+                    $i = 1;
+                    foreach ($this->request_doc as $key => $doc){
+                        ?>
+                        <tr>
+                            <td class="text-right"><?=$i?></td>
+                            <td class="text-left"><?=$doc['document_type_name']?></td>
+                            <td class="text-left"><?=$doc['document_name']?></td>
+                            <td class="text-left"><?=$doc['fio']?></td>
+                            <td class="text-center"><?=$doc['doc_date']?></td>
+                            <td class="text-left">
+                                <div class="action-buttons">
+                                    <a href="<?=$doc['document_url']?>" title="Скачать" target="_blank">
+                                        <i class="fa fa-download" aria-hidden="true">
+                                        </i>
+                                    </a>
+                                    <a class="red" <?if(getCurEmployee() != $doc['employee_id']){?> style="display: none;" <?}?> href="javascript:void(0);" onclick="delDocument(<?=$doc['document_id']?>, this)">
+                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?
+                        $i = $i + 1;
+                    }
+                }
+                ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="payments" <?if(getCurPositionCode() != 'ADMIN'){?>style="display: none" <?}?> class="tab-pane fade">
+        <a href="javascript:void(0)" onclick="showPaymentForm(<?=$this->request_id?>)" class="btn btn-info btn-xs pull-right">Добавить платеж</a>
+        <div class="clearfix"></div>
+        <hr>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered hover-table no-margin-bottom no-border-top">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Тип</th>
+                    <th>Сумма</th>
+                    <th>Комментарий</th>
+                    <th>Работник</th>
+                    <th>Дата создания</th>
+                    <th>Статус</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?
+                if(mycount($this->row_payment) > 0){
+                    $i = 1;
+                    foreach ($this->row_payment as $key => $doc){
+                        ?>
+                        <tr>
+                            <td class="text-right"><?=$i?></td>
+                            <td class="text-left"><?=$doc['payment_type']?></td>
+                            <td class="text-center"><?=tenge_text($doc['payment_sum'])?></td>
+                            <td class="text-left"><?=$doc['comment']?></td>
+                            <td class="text-left"><?=$doc['fio']?></td>
+                            <td class="text-center"><?=$doc['payment_date']?></td>
+                            <td class="text-center"><?=$doc['is_accept_text']?></td>
+                            <td class="text-left">
+                                <div class="action-buttons">
+                                    <?if(isset($doc['document_url'])){?>
+                                        <a href="<?=$doc['document_url']?>" title="Скачать" target="_blank">
+                                            <i class="fa fa-download" aria-hidden="true">
+                                            </i>
+                                        </a>
+                                    <?}?>
+                                    <a class="red" <?if(getCurEmployee() != $doc['employee_id']){?> style="display: none;" <?}?> href="javascript:void(0);" onclick="delPayment(<?=$doc['payment_id']?>, this)">
+                                        <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                    </a>
+                                    <?if($doc['is_accept'] == 0){?>
+                                        <a class="green"  href="javascript:void(0);" onclick="accpetPayment(<?=$doc['payment_id']?>, this)">
+                                            <i class="ace-icon fa fa-check bigger-130"></i>
+                                        </a>
+                                    <?}?>
+                                </div>
+                            </td>
+                        </tr>
+                        <?
+                        $i = $i + 1;
+                    }
+                }
+                ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<?=$this->partial('dict/modal-container.phtml');?>
+
+<script type="text/javascript">
+    $( document ).ready(function() {
+        $(function() {
+            var lastTab = localStorage.getItem('lastTab');
+            $('.tabs, .tab-content').removeClass('hidden');
+            if (lastTab) {
+                $('[data-target="' + lastTab + '"]').tab('show');
+                $('.measure-tabs a:first').tab('show');
+            }else{
+                $('.main-tabs a:first').tab('show');
+            }
+            $('.main-tabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                localStorage.setItem('lastTab', $(this).data('target'));
+                $('.measure-tabs a:first').tab('show');
+            });
+        });
+        $('#is_paid').change(function () {
+            if (!confirm('Вы действительно хотите изменить статус на оплачено?')) {
+                return false;
+            }
+            if ($(this).prop("checked")) {
+                var is_paid = 1;
+            }
+            else {
+                var is_paid = 0;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "/dict/index-json/mode/is_paid",
+                data: {"request_id" : <?=$this->request_id?>, "is_paid" : is_paid},
+                async: true,
+                success: function(data){
+                    if(data.result['status'] == false){
+                        Notify.generate('Ошибка', '', 3);
+                        alert(data.result['error']);
+                        if ($("#is_paid").is(':checked')) {
+                            $("#is_paid").prop('checked', false);
+                        }
+                    }
+                    else{
+                        if(data.result['value'] == 0){
+                            Notify.generate('Ошибка', '', 2);
+                        }else{
+                            Notify.generate('Успешно', '', 1);
+                        }
+                    }
+                }
+            });
+        });
+        $('#is_accepted').change(function () {
+            if (!confirm('Вы действительно хотите изменить статус принят клиентом?')) {
+                return false;
+            }
+            if ($(this).prop("checked")) {
+                var is_accepted = 1;
+            }
+            else {
+                var is_accepted = 0;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "/dict/index-json/mode/is_accepted",
+                data: {"request_id" : <?=$this->request_id?>, "is_accepted" : is_accepted},
+                async: true,
+                success: function(data){
+                    if(data.result['status'] == false){
+                        Notify.generate('Ошибка', '', 3);
+                        alert(data.result['error']);
+                        if ($("#is_accepted").is(':checked')) {
+                            $("#is_accepted").prop('checked', false);
+                        }
+                    }
+                    else{
+                        if(data.result['value'] == 0){
+                            Notify.generate('Ошибка', '', 2);
+                        }else{
+                            Notify.generate('Успешно', '', 1);
+                        }
+                    }
+                }
+            });
+        });
+    });
+
+    function showDocForm(request_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Добавить документы');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/document-edit-request/",
+            data: {"request_id" : request_id,},
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+    function showPaymentForm(request_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Добавить документы');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/payment-edit-request/",
+            data: {"request_id" : request_id,},
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+
+    function showWorkForm(request_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Добавить работу');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-edit/",
+            data: {"request_id" : request_id,},
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+    function client_request_upd_doc(){
+        var fd = new FormData($("#client_request_doc_form")[0]);
+        $.ajax({
+            type: 'POST',
+            url: "/dict/request-edit/mode/upd-doc/",
+            data: fd,
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при добавлении файла', '', 3);
+                } else{
+                    $(".modal").modal('hide');
+                    Notify.generate('Файл загружен успешно', '', 1);
+                    location.reload();
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+
+    function client_request_upd_payment(){
+        var fd = new FormData($("#client_request_payment_form")[0]);
+        $.ajax({
+            type: 'POST',
+            url: "/dict/request-edit/mode/upd-payment/",
+            data: fd,
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при добавлении платежа', '', 3);
+                } else{
+                    $(".modal").modal('hide');
+                    Notify.generate('Платеж загружен успешно', '', 1);
+                    location.reload();
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+
+    function work_request_upd(){
+        var fd = new FormData($("#request_work")[0]);
+        $.ajax({
+            type: 'POST',
+            url: "/dict/request-edit/mode/upd-work/",
+            data: fd,
+            success: function(data){
+                console.log(data);
+                if(data.result['status'] == false){
+                    alert(data.result['error']);
+                    Notify.generate('Ошибка при добавлении работы', '', 3);
+                } else{
+                    $(".modal").modal('hide');
+                    Notify.generate('Работа успешно создана', '', 1);
+                    location.reload();
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+
+    function delDocument(document_id, ob){
+        if (!confirm('Вы действительно хотите удалить данный документ?')) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/request-edit/mode/del-doc/document_id/" + document_id + "/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.result['error']);
+                }
+                else{
+                    Notify.generate('Документ удален', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+    function delPayment(payment_id, ob){
+        if (!confirm('Вы действительно хотите удалить данный платеж?')) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/request-edit/mode/del-payment/payment_id/" + payment_id + "/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.result['error']);
+                }
+                else{
+                    Notify.generate('Платеж удален', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+    function accpetPayment(payment_id, ob){
+        if (!confirm('Вы действительно хотите принять данный платеж?')) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/request-edit/mode/is-accept-payment/payment_id/" + payment_id + "/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.result['error']);
+                }
+                else{
+                    Notify.generate('Платеж принят', '', 1);
+                    location.reload();
+                }
+            }
+        });
+    }
+
+    function delWork(work_id, ob){
+        if (!confirm('Вы действительно хотите удалить данную работу?')) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/request-edit/mode/del-work/work_id/" + work_id + "/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.result['error']);
+                }
+                else{
+                    Notify.generate('Работа удалена', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+</script>

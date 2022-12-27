@@ -1,0 +1,90 @@
+<div class="page-header">
+    <h1 class="pull-left">Тип материалов</h1>
+    <div class="clearfix"></div>
+</div>
+<div class="hr hr-10 dotted hr-double"></div>
+<a href="javascript:void(0)" onclick="type_edit_show(0)" class="btn btn-info btn-xs pull-right">Добавить тип</a>
+<div class="clearfix"></div>
+<div class="row-fluid">
+    <div class="tabbable">
+        <table id="main_table" class="table-local table-striped table-bordered hover-table no-margin-bottom no-border-top">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Наименование</th>
+                <th>Код</th>
+                <th>Редактировать</th>
+                <th>Удалить</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?
+            if(mycount($this->row) > 0){
+                foreach ($this->row as $key => $value){?>
+                    <tr>
+                        <td class="text-right"><?=$value['material_type_id']?></td>
+                        <td class="text-left"><?=$value['material_type_name']?></td>
+                        <td class="text-left"><?=$value['material_type_code']?></td>
+                        <td class="text-center">
+                            <span class="blue bigger-140" title="Редактировать" onclick="type_edit_show(<?=$value['material_type_id']?>)">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="red bigger-140" title="Редактировать" onclick="type_edit_del(<?=$value['material_type_id']?>, this)">
+                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                            </span>
+                        </td>
+                    </tr>
+                    <?
+                }
+            }
+            ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<?=$this->partial('dict/modal-container.phtml');?>
+
+<script>
+    $(document).ready(function() {
+        autosize($('textarea[class*=autosize]'));
+    });
+
+    function type_edit_show(material_type_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Редактирование');
+
+        $.ajax({
+            type: 'POST',
+            url: "/dict/material-type-edit/",
+            data: {"material_type_id" : material_type_id},
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+
+    }
+    function type_edit_del(material_type_id, ob){
+        if (!confirm('Вы действительно хотите удалить данный тип?')) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/material-type-list/mode/del/material_type_id/" + material_type_id + "/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.result['error']);
+                }
+                else{
+                    Notify.generate('Тип удален', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+</script>

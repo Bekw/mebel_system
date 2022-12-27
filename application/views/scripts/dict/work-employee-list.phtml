@@ -1,0 +1,118 @@
+<div class="page-header">
+    <h1 class="pull-left">Оплата мастерам</h1>
+    <div class="clearfix"></div>
+</div>
+<div class="clearfix"></div>
+<div class="row-fluid">
+    <div class="tabbable">
+        <table id="main_table" class="table-local table-striped table-bordered hover-table no-margin-bottom no-border-top">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>ФИО</th>
+                <th>Должность</th>
+                <th>Платеж</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?
+            $i = 0;
+            $ob = new Application_Model_DbTable_Dict();
+            if(mycount($this->row) > 0){
+                foreach ($this->row as $key => $value){
+                    $i++;
+                    $payment = $ob->read_employee_work_price($value['employee_id'])['value'];
+                    ?>
+                    <tr>
+                        <td class="text-right"><?=$i?></td>
+                        <td class="text-left"><?=$value['fio']?></td>
+                        <td class="text-left"><?=$value['position_name']?></td>
+                        <td class="text-left">
+                            <table id="main_table" class="table-local table-striped table-bordered hover-table no-margin-bottom no-border-top">
+                                <thead>
+                                <tr>
+                                    <th>Цена</th>
+                                    <th>Начало</th>
+                                    <th>Конец</th>
+                                    <th>
+                                        <a href="javascript:void(0)" onclick="payment_form(<?=$value['employee_id']?>)" >
+                                            <i class="fa fa-plus-circle blue bigger-130" aria-hidden="true"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <?
+                                    if(mycount($payment) > 0){
+                                        foreach ($payment as $key => $value1){?>
+                                            <tr>
+                                                <td class="text-right"><?=$value1['price']?></td>
+                                                <td class="text-center"><?=$value1['date_begin']?></td>
+                                                <td class="text-center"><?=$value1['date_end']?></td>
+                                                <td class="text-center">
+                                                    <span class="red bigger-140" title="Удалить" onclick="work_employee_del(<?=$value1['employee_work_id']?>, this)">
+                                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <?
+                                        }
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </td>
+
+                    </tr>
+                    <?
+                }
+            }
+            ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<?=$this->partial('dict/modal-container.phtml');?>
+
+<script>
+    $(document).ready(function() {
+        autosize($('textarea[class*=autosize]'));
+    });
+
+    function payment_form(employee_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Редактирование');
+
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-employee-edit/",
+            data: {"employee_id" : employee_id},
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+
+    }
+    function work_employee_del(employee_work_id, ob){
+        if (!confirm('Вы действительно хотите удалить данный тип?')) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/work-employee-list/mode/del/employee_work_id/" + employee_work_id + "/",
+            success: function(data){
+                if(data.result['status'] == false){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.result['error']);
+                }
+                else{
+                    Notify.generate('Тип удален', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+</script>

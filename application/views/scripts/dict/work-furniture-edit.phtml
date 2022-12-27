@@ -1,0 +1,57 @@
+<?
+if (isset($this->row['error'])) {?>
+    <div class="alert alert-danger">
+        <?=$this->row['error']?>
+    </div>
+    <?
+}?>
+<div class="modal-body">
+    <form id="furniture_form">
+        <input type="hidden" name="furniture_id" value="<?=$this->furniture_id?>">
+        <input type="hidden" name="work_id" value="<?=$this->work_id?>">
+        <div class="form-group">
+            <label class="control-label" for="material_id">Материал</label>
+            <select class="form-control" id="material_id" name="material_id" required>
+                <option value="0">Выберите материал</option>
+                <?
+                if(mycount($this->row_material) > 0){
+                    foreach ($this->row_material as $key => $value){?>
+                        <option value="<?=$value['material_id']?>" <?if($this->row['material_id'] == $value['material_id']){?>selected<?}?>><?=$value['material_name']?></option>
+                        <?
+                    }
+                }?>
+            </select>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="cnt">Кол-во</label>
+            <input type="number" step="any" class="form-control" name="cnt" value="<?=$this->row['cnt']?>" id="cnt" required>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="price">Цена</label>
+            <input type="number" step="any" class="form-control" name="price" value="<?=$this->row['price']?>" id="price" required>
+            <div class="clearfix"></div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" onclick="work_furniture_upd()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $(".date-picker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+5"
+        });
+    });
+</script>

@@ -1,0 +1,102 @@
+<div class="page-header">
+    <h1 class="pull-left">
+        Работы
+        <?
+        if($this->stage_id == 1){
+            echo '(Дизайн)';
+        }elseif ($this->stage_id == 2){
+            echo '(Подготовка)';
+        }elseif ($this->stage_id == 3){
+            echo '(Распил)';
+        }elseif ($this->stage_id == 4){
+            echo '(Шлифовка)';
+        }elseif ($this->stage_id == 5){
+            echo '(Маляр)';
+        }elseif ($this->stage_id == 6){
+            echo '(Доставка)';
+        }else{
+            echo '(Установка)';
+        }
+        ?>
+        (<?=mycount($this->row)?>)
+    </h1>
+    <div class="clearfix"></div>
+</div>
+
+<div class="hr hr-10 dotted hr-double"></div>
+<div class="table-responsive" id="account_load">
+    <table class="table-local table-striped table-bordered hover-table no-margin-bottom no-border-top" id="account_tab">
+        <thead>
+        <tr>
+            <th style="width: 10px;">ID</th>
+            <th>Мебель</th>
+            <th>Клиент ФИО</th>
+            <th>Адрес</th>
+            <th>Телефон</th>
+            <th>Площадь</th>
+            <th>Время этапа</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?
+        foreach ( (array) $this->row as $key => $value){?>
+            <tr>
+                <td class="text-right"><?=$value['work_id']?></td>
+                <td class="text-left">
+                    <a href="/dict/work-detail/work_id/<?=$value['work_id']?>/"><?=$value['work_name']?></a>
+                </td>
+                <td class="text-left"><?=$value['client_fio']?></td>
+                <td class="text-left"><?=$value['address']?></td>
+                <td class="text-left"><?=$value['client_phone']?></td>
+                <td class="text-right"><?=$value['house_area']?></td>
+                <td class="text-right"><?=$value['stage_date']?></td>
+            </tr>
+            <?
+        }
+        ?>
+        </tbody>
+    </table>
+</div>
+<?=$this->partial('dict/modal-container.phtml');?>
+
+<script>
+    function showEditForm(request_id){
+        $('#modal-container').find('.modal-dialog').addClass('modal-sm');
+        $("#modal-header-container").empty();
+        $("#modal-body-container").empty();
+        $('#modal-header-container').append('Добавление/Редактирование счёта');
+        $.ajax({
+            type: 'POST',
+            url: "/dict/account-edit/",
+            data: {
+                request_id : request_id
+            },
+            async: true,
+            success: function(data){
+                $("#modal-body-container").html(data);
+            }
+        });
+        $("#modal-container").filter('.modal').modal();
+    }
+
+    function delAccount(request_id, account_name, ob){
+        if (!confirm("Вы действительно хотите удалить " +account_name + " ?")) {
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "/dict/account-list/mode/del/request_id/" + request_id + "/",
+            success: function(data){
+                if(data.exception != undefined){
+                    Notify.generate('Ошибка', '', 3);
+                    alert(data.exception);
+                }
+                else{
+                    Notify.generate(account_name + ' удален', '', 1);
+                    $(ob).closest("tr").remove();
+                }
+            }
+        });
+    }
+
+</script>

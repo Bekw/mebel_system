@@ -1,0 +1,97 @@
+<div class="page-header">
+    <h1>Уведомления</h1>
+</div>
+<div class="message-container">
+    <div class="message-navbar clearfix">
+        <div class="message-bar">
+            <div class="message-infobar" id="id-message-infobar">
+                <span class="grey bigger-110">Количество непрочитанных: <span id="email_cnt_not_reviewed"><?=count($this->row_review)?></span></span>
+            </div>
+        </div>
+        <div>
+            <form class="form-search" method="post">
+                <div class="messagebar-item-right">
+                    <div class="inline position-relative">
+                        <select name="is_reviewed" id="is_reviewed" style="height: auto;">
+                            <option value="-1" <? if($this->is_reviewed == -1){echo ' selected';}?>>Все</option>
+                            <option value="0" <? if($this->is_reviewed == 0){echo ' selected';}?>>Непрочитанные</option>
+                            <option value="1" <? if($this->is_reviewed == 1){echo ' selected';}?>>Прочитанные</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="nav-search">
+                    <span class="input-icon">
+                        <input type="text" autocomplete="off" class="input-small nav-search-input" placeholder="Поиск ..." value="<?=$this->search?>" name="search" />
+                        <i class="ace-icon fa fa-search nav-search-icon"></i>
+                    </span>
+                    <button type="submit" class="btn btn-primary btn-minier">Искать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="message-list-container">
+        <div class="message-list">
+            <?
+            if(count($this->row) > 0){
+                foreach($this->row as $key => $value){
+                    $message_unread = ' message-unread';
+                    $message_unread_icon = ' fa-circle orange2';
+                    if($value['is_reviewed'] == 1){
+                        $message_unread = '';
+                        $message_unread_icon = ' fa-circle-o light-grey';
+                    }
+                    ?>
+                    <div class="message-item <?=$message_unread?>">
+                        <i class="message-star ace-icon fa <?=$message_unread_icon?>" onclick="reviewEmail(<?=$value['send_email_user_id']?>, this);"></i>
+<!--                        <span class="sender" title="Alex John Red Smith">Alex John Red Smith </span>-->
+                        <span class="time" style="width: auto;"><?=$value['date_send']?></span>
+                        <span class="summary">
+                            <a href="/system/notification-view/send_email_user_id/<?=$value['send_email_user_id']?>" class="text"><?=$value['email_title']?></a>
+                        </span>
+                    </div>
+                    <?
+                }
+            }else{?>
+                <div class="message-item">
+                    <div class="alert alert-info text-center">Нет данных для отображения...</div>
+                </div>
+                <?
+            }?>
+        </div>
+    </div>
+    <div class="message-footer clearfix">
+        <div class="pull-left">Всего: <?=count($this->row)?></div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#is_reviewed').change(function(){
+            $(this).closest('form').submit();
+        });
+    });
+    function reviewEmail(send_email_user_id, ob) {
+        $.ajax({
+            type: 'POST',
+            url: "/system/notification-list/mode/review/",
+            data: {send_email_user_id: send_email_user_id},
+            success: function(data){
+                if(data.result['status']){
+                    //window.location.href = window.location.href;
+                    if(data.result['value'] == 1){
+                        $(ob).removeClass('fa-circle orange2').addClass('fa-circle-o light-grey');
+                        $(ob).closest('.message-item').removeClass('message-unread');
+                        show_layout_notification();
+                    }else{
+                        $(ob).addClass('fa-circle orange2').removeClass('fa-circle-o light-grey');
+                        $(ob).closest('.message-item').addClass('message-unread');
+                        show_layout_notification();
+                    }
+                } else {
+                    Notify.generate('Ошибка', data.result['error'], 3);
+                }
+
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,70 @@
+<?
+if (isset($this->row['error'])) {?>
+    <div class="alert alert-danger">
+        <?=$this->row['error']?>
+    </div>
+    <?
+}?>
+<div class="modal-body">
+    <form id="item_work">
+        <input type="hidden" name="work_item_id" value="<?=$this->work_item_id?>">
+        <input type="hidden" name="work_id" value="<?=$this->work_id?>">
+        <div class="form-group">
+            <label class="control-label " for="item_type_id">Тип</label>
+            <div class="form-control no-padding">
+                <select class="form-control" id="item_type_id" name="item_type_id" required>
+                    <option value="0">Выберите тип</option>
+                    <?
+                    if(mycount($this->item_type) > 0){
+                        foreach ($this->item_type as $key => $value){?>
+                            <option value="<?=$value['item_type_id']?>" <?if($this->row['item_type_id'] == $value['item_type_id']){?>selected<?}?>><?=$value['name']?></option>
+                            <?
+                        }
+                    }?>
+                </select>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label " for="common_measure_item_id">Название</label>
+            <div class="form-control no-padding">
+                <select class="form-control" id="common_measure_type_id" name="common_measure_type_id" required>
+                    <option value="0">Выберите тип</option>
+                    <?
+                    if(mycount($this->item_common) > 0){
+                        foreach ($this->item_common as $key => $value){?>
+                            <option value="<?=$value['common_measure_type_id']?>" <?if($this->row['common_measure_type_id'] == $value['common_measure_type_id']){?>selected<?}?>><?=$value['name']?></option>
+                            <?
+                        }
+                    }?>
+                </select>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="name">Кол-во</label>
+            <input type="number" step="any" class="form-control" name="cnt" value="<?=$this->row['cnt']?>" id="cnt" required>
+            <div class="clearfix"></div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" onclick="work_item_upd()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $(".date-picker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+5"
+        });
+    });
+</script>

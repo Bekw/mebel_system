@@ -1,0 +1,66 @@
+<?
+if (isset($this->row['error'])) {?>
+    <div class="alert alert-danger">
+        <?=$this->row['error']?>
+    </div>
+    <?
+}?>
+<div class="modal-body">
+    <form id="client_request_payment_form">
+        <input type="hidden" name="request_id" value="<?=$this->request_id?>">
+        <div class="form-group">
+            <label class="control-label" for="payment_sum">Сумма</label>
+            <input type="number" step="any" class="form-control" name="payment_sum" id="payment_sum" required>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label " for="auditor_comment">Комментарии</label>
+            <textarea class="form-control" name="comment" style="height: 100px; overflow: hidden; overflow-wrap: break-word; resize: horizontal;" id="comments" placeholder="Комментарии"></textarea>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label " for="payment_type_id">Тип платежа</label>
+            <div class="form-control no-padding">
+                <select class="form-control" id="payment_type_id" name="payment_type_id" required>
+                    <option value="0">Выберите тип</option>
+                    <?
+                    if(mycount($this->payment_type) > 0){
+                        foreach ($this->payment_type as $key => $value){?>
+                            <option value="<?=$value['payment_type_id']?>"><?=$value['name']?></option>
+                            <?
+                        }
+                    }?>
+                </select>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label " for="upload">Вложения</label>
+            <div class="form-control no-padding">
+                <input type="file" name="upload" id="upload" >
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+    </form>
+</div>
+<div class="modal-footer no-margin-top">
+    <button type="button" class="btn btn-sm btn-success" onclick="client_request_upd_payment()">
+        <i class="ace-icon fa fa-check"></i>
+        Сохранить
+    </button>
+    <button class="btn btn-sm btn-danger" data-dismiss="modal">
+        <i class="ace-icon fa fa-times"></i>
+        Закрыть
+    </button>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $(".date-picker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+5"
+        });
+    });
+</script>
